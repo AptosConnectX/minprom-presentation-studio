@@ -297,7 +297,10 @@ export async function POST(req: NextRequest) {
     slides = slides.slice(0, 11);
     const pptxBuffer = await buildPptx(slides);
 
-    return new NextResponse(pptxBuffer, {
+    // Fix TypeScript: Buffer -> Uint8Array for NextResponse body
+    const body = new Uint8Array(pptxBuffer);
+
+    return new NextResponse(body, {
       status: 200,
       headers: {
         "Content-Type": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
