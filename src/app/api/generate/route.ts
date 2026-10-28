@@ -8,44 +8,66 @@ export const runtime = "nodejs";
 
 const SYSTEM_PROMPT = `Ты — специализированный ИИ-помощник Министерства промышленности, энергетики и инноваций Республики Башкортостан.
 
-Твоя единственная задача — перерабатывать официальные сухие текстовые справки и доклады в структурированные презентации строго в формате .pptx (PowerPoint).
+Единственная задача — перерабатывать официальные справки и доклады в структурированные презентации.
 
-При создании презентации соблюдай следующие жесткие стилистические правила:
+ЖЁСТКИЕ ПРАВИЛА СТИЛЯ:
+- Фон слайда: #011233
+- Заголовок: ВЕРХУ ПО ЦЕНТРУ, Arial 22pt, белый, Bold, СТРОГО КАПСОМ, без точек/тире/вертикальных черт
+- Крупные цифры: Arial 40-44pt, цвет #87E1C1 (плюс), #F26568 (минус), #A9C7FD / #7AE4C2 (акцент)
+- Тезисы: короткие, естественные, 5–12 слов. НЕ натягивай искусственно «Глагол + Существительное»
+- Списки: маркер ▸
+- Максимум 10–11 слайдов. Агрегируй информацию.
 
-ЦВЕТОВАЯ ПАЛИТРА:
-- Основной фон слайда: Глубокий темно-синий цвет #011233
+КАК СТРОИТЬ ХОРОШИЕ СЛАЙДЫ (ориентир на эталон):
+1. Титульный слайд — название справки + период + ключевая дата.
+2. ИПП / динамика — крупные цифры 2025 и 2026 рядом, подписи «ниже/выше РФ и ПФО», блоки РОСТ и СНИЖЕНИЕ.
+3. Отгрузка + драйверы роста — крупные суммы + 5–6 отраслей с процентами крупно.
+4. Лидерство по продукции — три колонки: 1 МЕСТО / 2 МЕСТО / 3 МЕСТО со списками.
+5. Господдержка и ФРП — крупные суммы бюджета + факты по Фонду.
+6. Приоритетные инвестпроекты — портфель крупно + ключевые проекты с суммами.
+7. Крупные компании — карточки (Башнефть, Башкирская медь, БГК и т.д.) с суммой и кратким описанием.
+8. Энергетика — мощность, выработка, инвестиции + вводы объектов.
+9. Газомоторное топливо + инновации + рейтинги.
+10. Кадры + итоговые приоритеты.
 
-ТИПОГРАФИКА (СТРОГО ШРИФТ ARIAL):
-- Заголовок слайда: ВЕРХУ, ПО ЦЕНТРУ. Arial 22 пт, Белый (#FFFFFF), Bold, ВСЕГДА КАПСОМ.
-- Крупные цифры: Arial 44 пт. Цвет #87E1C1 (положительные), #F26568 (отрицательные), #A9C7FD или #7AE4C2 (акценты).
-- Короткие тезисы: Arial 20 пт, Bold.
-- Основной текст: Arial 14-16 пт, Белый.
+ЦИФРЫ ВСЕГДА ВЫНОСИ КРУПНО. Не прячь проценты и рубли внутри предложений.
 
-КАРТОЧКИ:
-- Скругленные прямоугольные рамки, толщина границы 3 пт, цвет белый, заливка прозрачная.
+Отвечай ТОЛЬКО валидным JSON-массивом. Никакого текста до/после JSON.
 
-РАБОТА ПО ТЕКСТУ:
-1. Разбей текст на логические блоки (1 блок = 1 слайд).
-2. Максимум 10-11 слайдов.
-3. Не копируй абзацы. Только краткие тезисы (Глагол + Существительное, до 7-10 слов).
-4. Цифры выноси крупным шрифтом отдельно.
-5. Заголовки чистые, КАПСОМ, без точек, тире, вертикальных черт.
-
-Отвечай ТОЛЬКО валидным JSON-массивом слайдов. Никакого текста до или после.
-
-Формат слайда:
+Схема слайда:
 {
   "title": "ЗАГОЛОВОК КАПСОМ",
-  "type": "metrics" | "cards" | "list" | "timeline" | "comparison" | "title",
-  "subtitle": "подзаголовок для title-слайда",
-  "metrics": [{"value": "106.6%", "label": "ИПП 2026", "positive": true}],
-  "cards": [{"title": "Краткий заголовок", "items": ["Тезис один", "Тезис два"]}],
+  "type": "title" | "metrics" | "split" | "columns" | "cards" | "list" | "timeline" | "summary",
+  "subtitle": "текст под заголовком (только для title)",
+  "metrics": [
+    {"value": "106,6%", "label": "ИПП янв–авг 2026", "positive": true, "note": "выше РФ на 6,6 п.п."}
+  ],
+  "left": {"title": "РОСТ", "items": ["Обрабатывающие 110,3%", "Энергетика 100,1%"]},
+  "right": {"title": "СНИЖЕНИЕ", "items": ["Добыча 94,0%", "Водоснабжение 94,3%"]},
+  "columns": [
+    {"title": "1 МЕСТО", "items": ["Кальцинированная сода", "Листовое стекло"]},
+    {"title": "2 МЕСТО", "items": ["Синтетические каучуки"]},
+    {"title": "3 МЕСТО", "items": ["Дизельное топливо"]}
+  ],
+  "cards": [
+    {"title": "Башнефть", "value": "69,5+ млрд", "items": ["6 проектов", "УЗК, ароматика"]}
+  ],
   "items": ["Тезис один", "Тезис два"],
-  "timeline": [{"date": "26–28 АВГУСТА 2025", "points": ["Результат 1", "Результат 2"]}],
-  "comparison": {"before": {"title": "БЫЛО", "value": "95.7%", "label": "ИПП 2025"}, "after": {"title": "СТАЛО", "value": "106.6%", "label": "ИПП 2026"}}
+  "timeline": [{"date": "МАЙ 2025", "points": ["ПС Инорс 50 МВА"]}],
+  "footer": "дополнительная строка внизу"
 }
 
-Первый слайд всегда типа "title".`;
+Правила выбора type:
+- title — только первый слайд
+- metrics — когда главные крупные цифры (можно + left/right)
+- split — два блока рядом (left + right)
+- columns — 2–3 равные колонки (лидерство, сравнение)
+- cards — 2–6 карточек предприятий/проектов
+- list — простой список тезисов
+- timeline — хроника вводов/событий
+- summary — итоги + приоритеты
+
+Первый слайд всегда type: "title".`;
 
 async function extractTextFromDocx(buffer: Buffer): Promise<string> {
   const result = await mammoth.extractRawText({ buffer });
@@ -64,164 +86,241 @@ async function buildPptx(slides: any[]): Promise<Buffer> {
   const ACCENT = "A9C7FD";
   const TEAL = "7AE4C2";
 
-  for (const slideData of slides) {
+  for (const s of slides) {
     const slide = pptx.addSlide();
     slide.addShape(pptx.ShapeType.rect, {
       x: 0, y: 0, w: "100%", h: "100%",
       fill: { color: BG },
     });
 
-    if (slideData.title) {
-      slide.addText(String(slideData.title).toUpperCase(), {
-        x: 0.5, y: 0.3, w: 12.3, h: 0.6,
-        fontSize: 22, fontFace: "Arial", color: WHITE, bold: true, align: "center",
+    // Title
+    if (s.title) {
+      slide.addText(String(s.title).toUpperCase(), {
+        x: 0.4, y: 0.25, w: 12.5, h: 0.55,
+        fontSize: 20, fontFace: "Arial", color: WHITE, bold: true, align: "center",
       });
     }
 
-    if (slideData.type === "title") {
-      slide.addText(slideData.subtitle || "Министерство промышленности, энергетики и инноваций РБ", {
-        x: 1, y: 3.2, w: 11.3, h: 0.5,
-        fontSize: 16, fontFace: "Arial", color: ACCENT, align: "center",
+    // ===== TITLE SLIDE =====
+    if (s.type === "title") {
+      slide.addText(s.subtitle || "Министерство промышленности, энергетики и инноваций РБ", {
+        x: 1, y: 2.8, w: 11.3, h: 0.5,
+        fontSize: 18, fontFace: "Arial", color: ACCENT, align: "center",
       });
-      if (slideData.metrics?.[0]) {
-        slide.addText(String(slideData.metrics[0].value), {
-          x: 1, y: 4.0, w: 11.3, h: 0.8,
-          fontSize: 44, fontFace: "Arial", color: GREEN, align: "center", bold: true,
+      if (s.metrics?.[0]) {
+        slide.addText(String(s.metrics[0].value), {
+          x: 1, y: 3.6, w: 11.3, h: 0.9,
+          fontSize: 48, fontFace: "Arial", color: GREEN, align: "center", bold: true,
         });
+        if (s.metrics[0].label) {
+          slide.addText(s.metrics[0].label, {
+            x: 1, y: 4.5, w: 11.3, h: 0.4,
+            fontSize: 16, fontFace: "Arial", color: WHITE, align: "center",
+          });
+        }
       }
       continue;
     }
 
-    if (slideData.metrics?.length) {
-      const count = Math.min(slideData.metrics.length, 4);
-      const cardW = 2.8;
-      const gap = 0.3;
+    // ===== METRICS (top row of big numbers) =====
+    let contentStartY = 1.05;
+    if (s.metrics?.length) {
+      const count = Math.min(s.metrics.length, 4);
+      const cardW = count === 1 ? 5.5 : count === 2 ? 5.2 : count === 3 ? 3.6 : 2.9;
+      const gap = 0.25;
       const totalW = count * cardW + (count - 1) * gap;
       const startX = (13.333 - totalW) / 2;
 
-      slideData.metrics.slice(0, 4).forEach((m: any, i: number) => {
+      s.metrics.slice(0, 4).forEach((m: any, i: number) => {
         const x = startX + i * (cardW + gap);
         const color = m.positive === false ? RED : m.accent ? ACCENT : GREEN;
 
         slide.addShape(pptx.ShapeType.roundRect, {
-          x, y: 1.3, w: cardW, h: 1.8,
-          fill: { type: "none" },
-          line: { color: WHITE, width: 1.5 },
-          rectRadius: 0.15,
-        });
-
-        slide.addText(String(m.value), {
-          x, y: 1.5, w: cardW, h: 0.9,
-          fontSize: 36, fontFace: "Arial", color, bold: true, align: "center",
-        });
-
-        slide.addText(m.label || "", {
-          x: x + 0.1, y: 2.5, w: cardW - 0.2, h: 0.4,
-          fontSize: 12, fontFace: "Arial", color: WHITE, align: "center",
-        });
-      });
-    }
-
-    if (slideData.cards?.length) {
-      const count = Math.min(slideData.cards.length, 3);
-      const cardW = 3.7;
-      const gap = 0.35;
-      const totalW = count * cardW + (count - 1) * gap;
-      const startX = (13.333 - totalW) / 2;
-      const startY = slideData.metrics?.length ? 3.5 : 1.4;
-
-      slideData.cards.slice(0, 3).forEach((card: any, i: number) => {
-        const x = startX + i * (cardW + gap);
-
-        slide.addShape(pptx.ShapeType.roundRect, {
-          x, y: startY, w: cardW, h: 3.2,
+          x, y: 1.05, w: cardW, h: m.note ? 2.05 : 1.7,
           fill: { type: "none" },
           line: { color: WHITE, width: 1.5 },
           rectRadius: 0.12,
         });
 
-        if (card.title) {
-          slide.addText(card.title, {
-            x: x + 0.2, y: startY + 0.2, w: cardW - 0.4, h: 0.4,
-            fontSize: 14, fontFace: "Arial", color: TEAL, bold: true,
+        slide.addText(String(m.value), {
+          x, y: 1.15, w: cardW, h: 0.85,
+          fontSize: count >= 4 ? 28 : 36, fontFace: "Arial", color, bold: true, align: "center",
+        });
+
+        slide.addText(m.label || "", {
+          x: x + 0.1, y: 2.0, w: cardW - 0.2, h: 0.4,
+          fontSize: 12, fontFace: "Arial", color: WHITE, align: "center",
+        });
+
+        if (m.note) {
+          slide.addText(m.note, {
+            x: x + 0.1, y: 2.4, w: cardW - 0.2, h: 0.45,
+            fontSize: 11, fontFace: "Arial", color: ACCENT, align: "center",
           });
         }
+      });
+      contentStartY = s.metrics[0]?.note ? 3.3 : 3.0;
+    }
 
-        if (card.items) {
-          slide.addText(card.items.map((item: string) => "▸  " + item).join("\n"), {
-            x: x + 0.2, y: startY + 0.7, w: cardW - 0.4, h: 2.3,
+    // ===== LEFT / RIGHT SPLIT =====
+    if (s.left || s.right) {
+      const y = contentStartY;
+      const h = 3.6;
+
+      if (s.left) {
+        slide.addShape(pptx.ShapeType.roundRect, {
+          x: 0.5, y, w: 5.9, h,
+          fill: { type: "none" },
+          line: { color: WHITE, width: 1.5 },
+          rectRadius: 0.12,
+        });
+        slide.addText(s.left.title || "", {
+          x: 0.7, y: y + 0.2, w: 5.5, h: 0.4,
+          fontSize: 16, fontFace: "Arial", color: GREEN, bold: true,
+        });
+        if (s.left.items?.length) {
+          slide.addText(s.left.items.map((t: string) => "▸  " + t).join("\n\n"), {
+            x: 0.7, y: y + 0.75, w: 5.5, h: h - 1,
+            fontSize: 15, fontFace: "Arial", color: WHITE, valign: "top",
+          });
+        }
+      }
+
+      if (s.right) {
+        slide.addShape(pptx.ShapeType.roundRect, {
+          x: 6.9, y, w: 5.9, h,
+          fill: { type: "none" },
+          line: { color: WHITE, width: 1.5 },
+          rectRadius: 0.12,
+        });
+        slide.addText(s.right.title || "", {
+          x: 7.1, y: y + 0.2, w: 5.5, h: 0.4,
+          fontSize: 16, fontFace: "Arial", color: RED, bold: true,
+        });
+        if (s.right.items?.length) {
+          slide.addText(s.right.items.map((t: string) => "▸  " + t).join("\n\n"), {
+            x: 7.1, y: y + 0.75, w: 5.5, h: h - 1,
+            fontSize: 15, fontFace: "Arial", color: WHITE, valign: "top",
+          });
+        }
+      }
+      continue;
+    }
+
+    // ===== COLUMNS (1/2/3 place, equal columns) =====
+    if (s.columns?.length) {
+      const count = Math.min(s.columns.length, 3);
+      const cardW = count === 2 ? 5.8 : 3.9;
+      const gap = 0.3;
+      const totalW = count * cardW + (count - 1) * gap;
+      const startX = (13.333 - totalW) / 2;
+      const y = contentStartY;
+
+      s.columns.slice(0, 3).forEach((col: any, i: number) => {
+        const x = startX + i * (cardW + gap);
+        slide.addShape(pptx.ShapeType.roundRect, {
+          x, y, w: cardW, h: 5.5,
+          fill: { type: "none" },
+          line: { color: WHITE, width: 1.5 },
+          rectRadius: 0.12,
+        });
+        slide.addText(col.title || "", {
+          x: x + 0.15, y: y + 0.2, w: cardW - 0.3, h: 0.45,
+          fontSize: 16, fontFace: "Arial", color: TEAL, bold: true, align: "center",
+        });
+        if (col.items?.length) {
+          slide.addText(col.items.map((t: string) => "▸  " + t).join("\n"), {
+            x: x + 0.2, y: y + 0.8, w: cardW - 0.4, h: 4.4,
             fontSize: 13, fontFace: "Arial", color: WHITE, valign: "top",
           });
         }
       });
+      continue;
     }
 
-    if (slideData.items?.length && !slideData.cards) {
-      const startY = slideData.metrics?.length ? 3.4 : 1.4;
-      slide.addText(slideData.items.map((item: string) => "▸  " + item).join("\n\n"), {
-        x: 1.2, y: startY, w: 10.9, h: 5,
+    // ===== CARDS (companies / projects) =====
+    if (s.cards?.length) {
+      const count = Math.min(s.cards.length, 6);
+      const cols = count <= 3 ? count : 3;
+      const rows = count <= 3 ? 1 : 2;
+      const cardW = cols === 1 ? 8 : cols === 2 ? 5.8 : 3.9;
+      const cardH = rows === 1 ? 4.8 : 2.5;
+      const gapX = 0.3;
+      const gapY = 0.25;
+      const totalW = cols * cardW + (cols - 1) * gapX;
+      const startX = (13.333 - totalW) / 2;
+      const startY = contentStartY;
+
+      s.cards.slice(0, 6).forEach((card: any, i: number) => {
+        const col = i % cols;
+        const row = Math.floor(i / cols);
+        const x = startX + col * (cardW + gapX);
+        const y = startY + row * (cardH + gapY);
+
+        slide.addShape(pptx.ShapeType.roundRect, {
+          x, y, w: cardW, h: cardH,
+          fill: { type: "none" },
+          line: { color: WHITE, width: 1.5 },
+          rectRadius: 0.1,
+        });
+
+        slide.addText(card.title || "", {
+          x: x + 0.15, y: y + 0.15, w: cardW - 0.3, h: 0.35,
+          fontSize: 14, fontFace: "Arial", color: TEAL, bold: true,
+        });
+
+        if (card.value) {
+          slide.addText(String(card.value), {
+            x: x + 0.15, y: y + 0.5, w: cardW - 0.3, h: 0.5,
+            fontSize: 22, fontFace: "Arial", color: GREEN, bold: true,
+          });
+        }
+
+        if (card.items?.length) {
+          const itemsY = card.value ? y + 1.1 : y + 0.6;
+          slide.addText(card.items.map((t: string) => "▸  " + t).join("\n"), {
+            x: x + 0.15, y: itemsY, w: cardW - 0.3, h: cardH - (itemsY - y) - 0.15,
+            fontSize: 12, fontFace: "Arial", color: WHITE, valign: "top",
+          });
+        }
+      });
+      continue;
+    }
+
+    // ===== TIMELINE =====
+    if (s.timeline?.length) {
+      let y = contentStartY;
+      for (const t of s.timeline.slice(0, 4)) {
+        slide.addText(t.date || "", {
+          x: 0.6, y, w: 12, h: 0.35,
+          fontSize: 16, fontFace: "Arial", color: TEAL, bold: true,
+        });
+        slide.addShape(pptx.ShapeType.rect, {
+          x: 0.6, y: y + 0.4, w: 12, h: 0.015,
+          fill: { color: TEAL },
+        });
+        slide.addText((t.points || []).map((p: string) => "▸  " + p).join("   "), {
+          x: 0.6, y: y + 0.5, w: 12, h: 0.7,
+          fontSize: 14, fontFace: "Arial", color: WHITE,
+        });
+        y += 1.35;
+      }
+      continue;
+    }
+
+    // ===== LIST / SUMMARY / fallback =====
+    if (s.items?.length) {
+      const y = contentStartY;
+      slide.addText(s.items.map((t: string) => "▸  " + t).join("\n\n"), {
+        x: 0.8, y, w: 11.7, h: 5.5,
         fontSize: 16, fontFace: "Arial", color: WHITE, valign: "top",
       });
     }
 
-    if (slideData.timeline?.length) {
-      let y = 1.4;
-      for (const t of slideData.timeline.slice(0, 3)) {
-        slide.addText(t.date, {
-          x: 1, y, w: 11.3, h: 0.4,
-          fontSize: 18, fontFace: "Arial", color: TEAL, bold: true,
-        });
-        slide.addShape(pptx.ShapeType.rect, {
-          x: 1, y: y + 0.45, w: 11.3, h: 0.02,
-          fill: { color: TEAL },
-        });
-        slide.addText((t.points || []).map((p: string) => "▸  " + p).join("\n"), {
-          x: 1.2, y: y + 0.6, w: 10.9, h: 1.2,
-          fontSize: 14, fontFace: "Arial", color: WHITE,
-        });
-        y += 1.9;
-      }
-    }
-
-    if (slideData.comparison) {
-      const { before, after } = slideData.comparison;
-
-      slide.addShape(pptx.ShapeType.roundRect, {
-        x: 1.5, y: 2.2, w: 4.5, h: 3,
-        fill: { type: "none" },
-        line: { color: WHITE, width: 1.5 },
-        rectRadius: 0.15,
-      });
-      slide.addText(before?.title || "БЫЛО", {
-        x: 1.5, y: 2.5, w: 4.5, h: 0.4,
-        fontSize: 14, fontFace: "Arial", color: WHITE, align: "center",
-      });
-      slide.addText(before?.value || "", {
-        x: 1.5, y: 3.1, w: 4.5, h: 0.9,
-        fontSize: 40, fontFace: "Arial", color: WHITE, align: "center", bold: true,
-      });
-      slide.addText(before?.label || "", {
-        x: 1.5, y: 4.2, w: 4.5, h: 0.4,
-        fontSize: 13, fontFace: "Arial", color: WHITE, align: "center",
-      });
-
-      slide.addShape(pptx.ShapeType.roundRect, {
-        x: 7.3, y: 2.2, w: 4.5, h: 3,
-        fill: { color: "1a5c4a" },
-        line: { color: GREEN, width: 1.5 },
-        rectRadius: 0.15,
-      });
-      slide.addText(after?.title || "СТАЛО", {
-        x: 7.3, y: 2.5, w: 4.5, h: 0.4,
-        fontSize: 14, fontFace: "Arial", color: WHITE, align: "center",
-      });
-      slide.addText(after?.value || "", {
-        x: 7.3, y: 3.1, w: 4.5, h: 0.9,
-        fontSize: 40, fontFace: "Arial", color: GREEN, align: "center", bold: true,
-      });
-      slide.addText(after?.label || "", {
-        x: 7.3, y: 4.2, w: 4.5, h: 0.4,
-        fontSize: 13, fontFace: "Arial", color: WHITE, align: "center",
+    if (s.footer) {
+      slide.addText(s.footer, {
+        x: 0.5, y: 6.9, w: 12.3, h: 0.35,
+        fontSize: 12, fontFace: "Arial", color: ACCENT, align: "center",
       });
     }
   }
@@ -268,22 +367,26 @@ export async function POST(req: NextRequest) {
         { role: "system", content: SYSTEM_PROMPT },
         {
           role: "user",
-          content: `Обработай следующую справку и верни ТОЛЬКО JSON-массив слайдов (максимум 11):\n\n${text.slice(0, 120000)}`,
+          content: `Обработай справку. Верни ТОЛЬКО JSON-массив слайдов (максимум 11). Цифры выноси крупно. Не делай неестественные формулировки.\n\n${text.slice(0, 120000)}`,
         },
       ],
-      temperature: 0.3,
-      max_tokens: 8000,
+      temperature: 0.25,
+      max_tokens: 10000,
     });
 
     let content = completion.choices[0]?.message?.content || "[]";
     content = content.replace(/```json\s*/gi, "").replace(/```\s*/g, "").trim();
+
+    // Try to extract JSON array if model wrapped it
+    const jsonMatch = content.match(/\[[\s\S]*\]/);
+    if (jsonMatch) content = jsonMatch[0];
 
     let slides: any[];
     try {
       slides = JSON.parse(content);
       if (!Array.isArray(slides)) throw new Error("Not an array");
     } catch {
-      console.error("Failed to parse LLM response:", content.slice(0, 500));
+      console.error("Failed to parse LLM response:", content.slice(0, 800));
       return NextResponse.json(
         { error: "Модель вернула некорректный JSON. Попробуйте ещё раз." },
         { status: 500 }
@@ -296,8 +399,6 @@ export async function POST(req: NextRequest) {
 
     slides = slides.slice(0, 11);
     const pptxBuffer = await buildPptx(slides);
-
-    // Fix TypeScript: Buffer -> Uint8Array for NextResponse body
     const body = new Uint8Array(pptxBuffer);
 
     return new NextResponse(body, {
