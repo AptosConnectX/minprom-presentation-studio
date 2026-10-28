@@ -93,7 +93,6 @@ async function buildPptx(slides: any[]): Promise<Buffer> {
       fill: { color: BG },
     });
 
-    // Title
     if (s.title) {
       slide.addText(String(s.title).toUpperCase(), {
         x: 0.4, y: 0.25, w: 12.5, h: 0.55,
@@ -101,7 +100,6 @@ async function buildPptx(slides: any[]): Promise<Buffer> {
       });
     }
 
-    // ===== TITLE SLIDE =====
     if (s.type === "title") {
       slide.addText(s.subtitle || "Министерство промышленности, энергетики и инноваций РБ", {
         x: 1, y: 2.8, w: 11.3, h: 0.5,
@@ -122,7 +120,6 @@ async function buildPptx(slides: any[]): Promise<Buffer> {
       continue;
     }
 
-    // ===== METRICS (top row of big numbers) =====
     let contentStartY = 1.05;
     if (s.metrics?.length) {
       const count = Math.min(s.metrics.length, 4);
@@ -162,7 +159,6 @@ async function buildPptx(slides: any[]): Promise<Buffer> {
       contentStartY = s.metrics[0]?.note ? 3.3 : 3.0;
     }
 
-    // ===== LEFT / RIGHT SPLIT =====
     if (s.left || s.right) {
       const y = contentStartY;
       const h = 3.6;
@@ -207,7 +203,6 @@ async function buildPptx(slides: any[]): Promise<Buffer> {
       continue;
     }
 
-    // ===== COLUMNS (1/2/3 place, equal columns) =====
     if (s.columns?.length) {
       const count = Math.min(s.columns.length, 3);
       const cardW = count === 2 ? 5.8 : 3.9;
@@ -238,7 +233,6 @@ async function buildPptx(slides: any[]): Promise<Buffer> {
       continue;
     }
 
-    // ===== CARDS (companies / projects) =====
     if (s.cards?.length) {
       const count = Math.min(s.cards.length, 6);
       const cols = count <= 3 ? count : 3;
@@ -287,7 +281,6 @@ async function buildPptx(slides: any[]): Promise<Buffer> {
       continue;
     }
 
-    // ===== TIMELINE =====
     if (s.timeline?.length) {
       let y = contentStartY;
       for (const t of s.timeline.slice(0, 4)) {
@@ -308,7 +301,6 @@ async function buildPptx(slides: any[]): Promise<Buffer> {
       continue;
     }
 
-    // ===== LIST / SUMMARY / fallback =====
     if (s.items?.length) {
       const y = contentStartY;
       slide.addText(s.items.map((t: string) => "▸  " + t).join("\n\n"), {
@@ -333,6 +325,15 @@ export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData();
     const file = formData.get("file") as File | null;
+    const extraRaw = formData.get("extraPrompts") as string | null;
+    let extraPrompts: string[] = [];
+    if (extraRaw) {
+      try {
+        extraPrompts = JSON.parse(extraRaw);
+      } catch {
+        extraPrompts = [];
+      }
+    }
 
     if (!file) {
       return NextResponse.json({ error: "Файл не передан" }, { status: 400 });
@@ -356,6 +357,13 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    let system = SYSTEM_PROMPT;
+    if (extraPrompts.length > 0) {
+      system +=
+        "\n\nДОПОЛНИТЕЛЬНЫЕ ИНСТРУКЦИИ ПОЛЬЗОВАТЕЛЯ (обязательно учти):\n" +
+        extraPrompts.map((p, i) => `${i + 1}. ${p}`).join("\n");
+    }
+
     const openai = new OpenAI({
       apiKey,
       baseURL: "https://api.proxyapi.ru/v1",
@@ -364,7 +372,7 @@ export async function POST(req: NextRequest) {
     const completion = await openai.chat.completions.create({
       model: "x-ai/grok-4.7",
       messages: [
-        { role: "system", content: SYSTEM_PROMPT },
+        { role: "system", content: system },
         {
           role: "user",
           content: `Обработай справку. Верни ТОЛЬКО JSON-массив слайдов (максимум 11). Цифры выноси крупно. Не делай неестественные формулировки.\n\n${text.slice(0, 120000)}`,
@@ -377,7 +385,6 @@ export async function POST(req: NextRequest) {
     let content = completion.choices[0]?.message?.content || "[]";
     content = content.replace(/```json\s*/gi, "").replace(/```\s*/g, "").trim();
 
-    // Try to extract JSON array if model wrapped it
     const jsonMatch = content.match(/\[[\s\S]*\]/);
     if (jsonMatch) content = jsonMatch[0];
 
