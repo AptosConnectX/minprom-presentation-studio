@@ -83,12 +83,10 @@ async function extractTextFromDocx(buffer: Buffer): Promise<string> {
 
 function extractJsCode(raw: string): string {
   let code = raw.trim();
-  // strip markdown fences if model ignored instructions
   code = code.replace(/^```(?:javascript|js|typescript|ts)?\s*/i, "");
   code = code.replace(/```\s*$/i, "");
   code = code.trim();
 
-  // if model wrapped in explanation, try to find the script body
   if (!code.includes("pptxgenjs") && !code.includes("PptxGenJS")) {
     const match = raw.match(
       /(?:const|var|let)\s+PptxGenJS[\s\S]*writeFile[\s\S]*/i
@@ -99,7 +97,6 @@ function extractJsCode(raw: string): string {
 }
 
 function sanitizeScript(code: string): string {
-  // Hard rejects
   const banned = [
     /require\s*\(\s*["']child_process["']\s*\)/i,
     /require\s*\(\s*["']fs["']\s*\)/i,
@@ -128,7 +125,6 @@ async function runScript(code: string): Promise<Buffer> {
   const scriptPath = path.join("/tmp", `pres_${id}.js`);
   const outPath = path.join("/tmp", `pres_${id}.pptx`);
 
-  // Ensure writeFile always targets our outPath even if model hardcodes something else
   const wrapper = `
 const __OUT__ = process.argv[2];
 process.argv[2] = __OUT__;
@@ -138,20 +134,16 @@ ${code}
   await writeFile(scriptPath, wrapper, "utf8");
 
   try {
-    await execFileAsync(
-      process.execPath,
-      [scriptPath, outPath],
-      {
-        timeout: 90000,
-        maxBuffer: 20 * 1024 * 1024,
-        env: {
-          PATH: process.env.PATH,
-          NODE_PATH: path.join(process.cwd(), "node_modules"),
-          HOME: "/tmp",
-        },
-        cwd: process.cwd(),
-      }
-    );
+    await execFileAsync(process.execPath, [scriptPath, outPath], {
+      timeout: 90000,
+      maxBuffer: 20 * 1024 * 1024,
+      env: {
+        ...process.env,
+        NODE_PATH: path.join(process.cwd(), "node_modules"),
+        HOME: "/tmp",
+      },
+      cwd: process.cwd(),
+    });
 
     const pptxBuf = await readFile(outPath);
     if (!pptxBuf || pptxBuf.length < 1000) {
@@ -244,7 +236,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Force require path resolution for pptxgenjs
     if (!code.includes('require("pptxgenjs")') && !code.includes("require('pptxgenjs')")) {
       code = `const PptxGenJS = require("pptxgenjs");\n` + code;
     }
@@ -254,7 +245,6 @@ export async function POST(req: NextRequest) {
       pptxBuffer = await runScript(code);
     } catch (e: any) {
       console.error("Script run failed:", e.message, e.stderr || "");
-      // One retry with a stricter reminder if syntax error
       const retryCompletion = await openai.chat.completions.create({
         model: "x-ai/grok-4.7",
         messages: [
