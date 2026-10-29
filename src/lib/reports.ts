@@ -264,11 +264,9 @@ export const REPORTS: ReportItem[] = [
   },
 ];
 
-/** Holidays and non-working days for RF 2026–2027 (five-day week) */
 const HOLIDAYS = new Set([
-  // 2026
   "2026-01-01", "2026-01-02", "2026-01-03", "2026-01-04", "2026-01-05",
-  "2026-01-06", "2026-01-07", "2026-01-08", "2026-01-09", // NY + transfer
+  "2026-01-06", "2026-01-07", "2026-01-08", "2026-01-09",
   "2026-02-21", "2026-02-22", "2026-02-23",
   "2026-03-07", "2026-03-08", "2026-03-09",
   "2026-05-01", "2026-05-02", "2026-05-03",
@@ -276,7 +274,6 @@ const HOLIDAYS = new Set([
   "2026-06-12", "2026-06-13", "2026-06-14",
   "2026-11-04",
   "2026-12-31",
-  // 2027
   "2027-01-01", "2027-01-02", "2027-01-03", "2027-01-04", "2027-01-05",
   "2027-01-06", "2027-01-07", "2027-01-08", "2027-01-09", "2027-01-10",
   "2027-02-21", "2027-02-22", "2027-02-23",
@@ -289,7 +286,10 @@ const HOLIDAYS = new Set([
 ]);
 
 function iso(d: Date): string {
-  return d.toISOString().slice(0, 10);
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
 }
 
 export function isWorkingDay(d: Date): boolean {
@@ -298,11 +298,9 @@ export function isWorkingDay(d: Date): boolean {
   return !HOLIDAYS.has(iso(d));
 }
 
-/** N-th working day starting from `from` (inclusive if working). */
 export function nthWorkingDay(from: Date, n: number): Date {
   const d = new Date(from);
   let count = 0;
-  // start from `from` itself
   while (true) {
     if (isWorkingDay(d)) {
       count++;
@@ -312,46 +310,56 @@ export function nthWorkingDay(from: Date, n: number): Date {
   }
 }
 
-/** First day of month after quarter end */
 function monthAfterQuarter(year: number, quarter: number): Date {
-  // Q1 ends Mar 31 → Apr 1; Q2 Jun 30 → Jul 1; Q3 Sep 30 → Oct 1; Q4 Dec 31 → Jan 1 next year
-  const month = quarter * 3; // 3,6,9,12 → next is 4,7,10,1
+  const month = quarter * 3;
   if (month === 12) return new Date(year + 1, 0, 1);
   return new Date(year, month, 1);
 }
 
 export type CalendarEvent = {
-  date: string; // YYYY-MM-DD
+  date: string;
   report: ReportItem;
   periodLabel: string;
 };
 
-/** Compute concrete deadlines for a given year */
-export function buildEventsForYear(year: number): CalendarEvent[] {
-  const events: CalendarEvent[] = [];
+function deadlineForReport(r: ReportItem, year: number, q: number | null): Date {
+  const rule = r.deadlineRule.toLowerCase();
+  if (r.period === "quarterly" && q !== null) {
+    const start = monthAfterQuarter(year, q);
+    if (rule.includes("5 рабоч") && rule.includes("следующего за отчетным кварталом")) {
+      return nthWorkingDay(new Date(start), 5);
+    }
+    if (rule.includes("10-го рабочего дня") || rule.includes("10 рабочего")) {
+      return nthWorkingDay(start, 10);
+    }
+    if (rule.includes("15-го рабочего") || rule.includes("15 рабочих")) {
+      return nthWorkingDay(start, 15);
+    }
+    if (rule.includes("10-го числа")) {
+      return new Date(start.getFullYear(), start.getMonth(), 10);
+    }
+    return nthWorkingDay(start, 10);
+  }
+  const jan1 = new Date(year, 0, 1);
+  if (rule.includes("1 апреля") || rule.includes("до 1 апреля")) return new Date(year, 3, 1);
+  if (rule.includes("1 марта") || rule.includes("до 1 марта")) return new Date(year, 2, 1);
+  if (rule.includes("15-го числа 2-го месяца")) return new Date(year, 1, 15);
+  if (rule.includes("5 рабочего дня")) return nthWorkingDay(jan1, 5);
+  if (rule.includes("30 рабочих")) return nthWorkingDay(jan1, 30);
+  if (rule.includes("45")) return new Date(year, 1, 14);
+  if (rule.includes("10 февраля")) return new Date(year, 1, 10);
+  return nthWorkingDay(jan1, 10);
+}
 
-  for (const r of REPORTS) {
+export function buildEventsForYear(
+  year: number,
+  reports: ReportItem[] = REPORTS
+): CalendarEvent[] {
+  const events: CalendarEvent[] = [];
+  for (const r of reports) {
     if (r.period === "quarterly") {
       for (let q = 1; q <= 4; q++) {
-        const start = monthAfterQuarter(year, q);
-        let deadline: Date;
-        const rule = r.deadlineRule.toLowerCase();
-
-        if (rule.includes("5 рабоч") && rule.includes("следующего за отчетным кварталом")) {
-          // next day after quarter end = start of next month, then 5th working day from quarter end+1
-          const afterQ = new Date(start);
-          deadline = nthWorkingDay(afterQ, 5);
-        } else if (rule.includes("10-го рабочего дня") || rule.includes("10 рабочего")) {
-          deadline = nthWorkingDay(start, 10);
-        } else if (rule.includes("15-го рабочего") || rule.includes("15 рабочих")) {
-          deadline = nthWorkingDay(start, 15);
-        } else if (rule.includes("10-го числа")) {
-          deadline = new Date(start.getFullYear(), start.getMonth(), 10);
-          // if weekend/holiday, still show the calendar day (official date)
-        } else {
-          deadline = nthWorkingDay(start, 10);
-        }
-
+        const deadline = deadlineForReport(r, year, q);
         events.push({
           date: iso(deadline),
           report: r,
@@ -359,30 +367,7 @@ export function buildEventsForYear(year: number): CalendarEvent[] {
         });
       }
     } else {
-      // annual — based on year that just ended → deadlines in `year` for report of `year-1`
-      const jan1 = new Date(year, 0, 1);
-      let deadline: Date;
-      const rule = r.deadlineRule.toLowerCase();
-
-      if (rule.includes("1 апреля") || rule.includes("до 1 апреля")) {
-        deadline = new Date(year, 3, 1);
-      } else if (rule.includes("1 марта") || rule.includes("до 1 марта")) {
-        deadline = new Date(year, 2, 1);
-      } else if (rule.includes("15-го числа 2-го месяца")) {
-        deadline = new Date(year, 1, 15); // 15 Feb
-      } else if (rule.includes("5 рабочего дня")) {
-        deadline = nthWorkingDay(jan1, 5);
-      } else if (rule.includes("30 рабочих")) {
-        deadline = nthWorkingDay(jan1, 30);
-      } else if (rule.includes("45")) {
-        // "45 числа" ≈ mid-February-ish; use Feb 14 as practical marker
-        deadline = new Date(year, 1, 14);
-      } else if (rule.includes("10 февраля")) {
-        deadline = new Date(year, 1, 10);
-      } else {
-        deadline = nthWorkingDay(jan1, 10);
-      }
-
+      const deadline = deadlineForReport(r, year, null);
       events.push({
         date: iso(deadline),
         report: r,
@@ -390,15 +375,25 @@ export function buildEventsForYear(year: number): CalendarEvent[] {
       });
     }
   }
-
   return events;
 }
 
-export function eventsByDate(year: number): Record<string, CalendarEvent[]> {
+export function eventsByDate(
+  year: number,
+  reports: ReportItem[] = REPORTS
+): Record<string, CalendarEvent[]> {
   const map: Record<string, CalendarEvent[]> = {};
-  for (const e of buildEventsForYear(year)) {
+  for (const e of buildEventsForYear(year, reports)) {
     if (!map[e.date]) map[e.date] = [];
     map[e.date].push(e);
   }
   return map;
+}
+
+export function mergeReports(
+  custom: ReportItem[],
+  removedIds: string[]
+): ReportItem[] {
+  const removed = new Set(removedIds);
+  return [...REPORTS.filter((r) => !removed.has(r.id)), ...custom];
 }
