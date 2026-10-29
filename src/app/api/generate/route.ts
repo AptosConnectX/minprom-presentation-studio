@@ -102,7 +102,6 @@ function sanitizeScript(code: string): string {
     /require\s*\(\s*["']fs["']\s*\)/i,
     /require\s*\(\s*["']net["']\s*\)/i,
     /require\s*\(\s*["']http["']\s*\)/i,
-    /require\s*\(\s*["']https["']\s*\)/i,
     /require\s*\(\s*["']os["']\s*\)/i,
     /process\.env/i,
     /eval\s*\(/i,
@@ -214,7 +213,7 @@ export async function POST(req: NextRequest) {
         },
       ],
       temperature: 0.2,
-      max_tokens: 16000,
+      max_tokens: 32000,
     });
 
     const raw = completion.choices[0]?.message?.content || "";
@@ -255,7 +254,7 @@ export async function POST(req: NextRequest) {
           },
         ],
         temperature: 0.15,
-        max_tokens: 16000,
+        max_tokens: 32000,
       });
       const raw2 = retryCompletion.choices[0]?.message?.content || "";
       let code2 = extractJsCode(raw2);
