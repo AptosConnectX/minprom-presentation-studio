@@ -13,6 +13,7 @@
     "next": "^15.1.0",
     "office-open": "^0.15.1",
     "openai": "^4.104.0",
+    "outline-to-slides": "^1.2.2",
     "pptxgenjs": "3.12",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
