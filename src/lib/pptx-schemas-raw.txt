@@ -1,0 +1,2218 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "office-open pptx schema slice: SlideOptions, SlideChild, ShapeOptions, TextBodyOptions, TextRunOptions, TableOptions, TextFontOptions, BackgroundOptions",
+  "description": "Sub-schema extracted on demand. Definitions marked as stubs accept any value — look one up by name to expand it. The full schema ships with the package.",
+  "definitions": {
+    "BackgroundOptions": {
+      "additionalProperties": false,
+      "properties": {
+        "blackWhiteMode": {
+          "$ref": "#/definitions/BlackWhiteMode",
+          "description": "`@bwMode` — unprefixed attribute on `p:bg`."
+        },
+        "effects": {
+          "$ref": "#/definitions/EffectListOptions"
+        },
+        "effectsList": {
+          "$ref": "#/definitions/EffectListOptions",
+          "description": "Compatibility spelling `a:effectsLst` used by some producers; round-trip only.",
+          "readOnly": true
+        },
+        "fill": {
+          "$ref": "#/definitions/FillOptions"
+        },
+        "reference": {
+          "$ref": "#/definitions/StyleMatrixReferenceOptions",
+          "description": "Style matrix reference (p:bgRef) — the common \"inherit theme background style\" form; mutually exclusive with fill."
+        },
+        "shadeToTitle": {
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    },
+    "StyleMatrixReferenceOptions": {
+      "title": "StyleMatrixReferenceOptions (stub)",
+      "description": "Reference into the theme style matrix — a:lnRef / a:fillRef / a:effectRef.\n\nShared by theme object defaults (spDef style), shape styles, and table styles; declared once here so every consumer sees the same shape.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"StyleMatrixReferenceOptions\"] }"
+    },
+    "SolidFillOptions": {
+      "title": "SolidFillOptions (stub)",
+      "description": "Union type for all color options supported by solid fill.\n\nExtends the original pattern with additional color types: RGB, scheme, HSL, system, and preset colors.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"SolidFillOptions\"] }"
+    },
+    "PresetColorOptions": {
+      "title": "PresetColorOptions (stub)",
+      "description": "Options for preset color.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"PresetColorOptions\"] }"
+    },
+    "SystemColorOptions": {
+      "title": "SystemColorOptions (stub)",
+      "description": "Options for system color.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"SystemColorOptions\"] }"
+    },
+    "HexColor": {
+      "title": "HexColor (stub)",
+      "description": "6-digit hex RGB color without '#' (e.g. FF0000).\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"HexColor\"] }"
+    },
+    "HslColorOptions": {
+      "title": "HslColorOptions (stub)",
+      "description": "Options for HSL color.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"HslColorOptions\"] }"
+    },
+    "SchemeColorOptions": {
+      "title": "SchemeColorOptions (stub)",
+      "description": "Options for scheme color.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"SchemeColorOptions\"] }"
+    },
+    "RgbColorOptions": {
+      "title": "RgbColorOptions (stub)",
+      "description": "Options for RGB color.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"RgbColorOptions\"] }"
+    },
+    "ScRgbColorOptions": {
+      "title": "ScRgbColorOptions (stub)",
+      "description": "Options for scRGB color.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"ScRgbColorOptions\"] }"
+    },
+    "FillOptions": {
+      "title": "FillOptions (stub)",
+      "description": "Fill options — discriminated union for DrawingML EG_FillProperties.\n\nSupports string shorthand for solid fill (most common case). Color fields accept hex strings or advanced SolidFillOptions (scheme color, HSL, etc.).\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"FillOptions\"] }"
+    },
+    "PresetPattern": {
+      "title": "PresetPattern (stub)",
+      "description": "Preset pattern values (a:pattFill `@prst`) — full words; xsdPattern maps them to the abbreviated XSD tokens.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"PresetPattern\"] }"
+    },
+    "TileOptions": {
+      "title": "TileOptions (stub)",
+      "description": "Options for tile fill mode.\n\nConfigures how an image is tiled (repeated) to fill a shape.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"TileOptions\"] }"
+    },
+    "UniversalMeasure": {
+      "title": "UniversalMeasure (stub)",
+      "description": "Measurement string: number followed by a unit (mm, cm, in, pt, pc, pi or px).\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"UniversalMeasure\"] }"
+    },
+    "TileFlipMode": {
+      "title": "TileFlipMode (stub)",
+      "description": "Tile flip mode for tiling images.\n\nSpecifies whether the image is flipped along the x-axis, y-axis, both axes, or not at all when tiling.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"TileFlipMode\"] }"
+    },
+    "TileAlignment": {
+      "title": "TileAlignment (stub)",
+      "description": "Tile alignment within the shape.\n\nSpecifies the anchor position of the first tile relative to the shape.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"TileAlignment\"] }"
+    },
+    "SourceRectangleOptions": {
+      "title": "SourceRectangleOptions (stub)",
+      "description": "Options for source rectangle cropping.\n\nEach value is integer percent (10 = 10% crop from that edge of the image).\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"SourceRectangleOptions\"] }"
+    },
+    "DataType": {
+      "title": "DataType (stub)",
+      "description": "Binary content as a string or an array of byte values.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"DataType\"] }"
+    },
+    "BlipCompression": {
+      "title": "BlipCompression (stub)",
+      "description": "Blip compression states (, the a:blip\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"BlipCompression\"] }"
+    },
+    "BlipEffectsOptions": {
+      "title": "BlipEffectsOptions (stub)",
+      "description": "All blip image adjustment effects.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"BlipEffectsOptions\"] }"
+    },
+    "TintEffectOptions": {
+      "title": "TintEffectOptions (stub)",
+      "description": "Options for tint effect.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"TintEffectOptions\"] }"
+    },
+    "LuminanceEffectOptions": {
+      "title": "LuminanceEffectOptions (stub)",
+      "description": "Options for luminance (brightness/contrast) effect.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"LuminanceEffectOptions\"] }"
+    },
+    "HSLEffectOptions": {
+      "title": "HSLEffectOptions (stub)",
+      "description": "Options for HSL effect.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"HSLEffectOptions\"] }"
+    },
+    "BlipEffectKind": {
+      "title": "BlipEffectKind (stub)",
+      "description": "Modeled blip effect field; `effectOrder` preserves source XML child order.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"BlipEffectKind\"] }"
+    },
+    "DuotoneEffectOptions": {
+      "title": "DuotoneEffectOptions (stub)",
+      "description": "Options for duotone effect.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"DuotoneEffectOptions\"] }"
+    },
+    "ColorReplaceEffectOptions": {
+      "title": "ColorReplaceEffectOptions (stub)",
+      "description": "Options for color replace effect.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"ColorReplaceEffectOptions\"] }"
+    },
+    "ColorChangeEffectOptions": {
+      "title": "ColorChangeEffectOptions (stub)",
+      "description": "Options for color change effect.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"ColorChangeEffectOptions\"] }"
+    },
+    "BlipBlurEffectOptions": {
+      "title": "BlipBlurEffectOptions (stub)",
+      "description": "Options for blur effect on blip.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"BlipBlurEffectOptions\"] }"
+    },
+    "BiLevelEffectOptions": {
+      "title": "BiLevelEffectOptions (stub)",
+      "description": "Options for biLevel (black & white threshold) effect.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"BiLevelEffectOptions\"] }"
+    },
+    "AlphaReplaceEffectOptions": {
+      "title": "AlphaReplaceEffectOptions (stub)",
+      "description": "Options for alpha replace effect.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"AlphaReplaceEffectOptions\"] }"
+    },
+    "AlphaModulateFixedEffectOptions": {
+      "title": "AlphaModulateFixedEffectOptions (stub)",
+      "description": "Options for alpha modulate fixed effect.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"AlphaModulateFixedEffectOptions\"] }"
+    },
+    "AlphaBiLevelEffectOptions": {
+      "title": "AlphaBiLevelEffectOptions (stub)",
+      "description": "Options for alpha bi-level effect.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"AlphaBiLevelEffectOptions\"] }"
+    },
+    "GradientFillOptions": {
+      "title": "GradientFillOptions (stub)",
+      "description": "Options for gradient fill.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"GradientFillOptions\"] }"
+    },
+    "RelativeRect": {
+      "title": "RelativeRect (stub)",
+      "description": "Relative rectangle with percentage offsets.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"RelativeRect\"] }"
+    },
+    "GradientStopOptions": {
+      "title": "GradientStopOptions (stub)",
+      "description": "Gradient stop options (simplified API). Position is 0-100 (percentage), color is a hex string or SolidFillOptions.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"GradientStopOptions\"] }"
+    },
+    "Percentage": {
+      "title": "Percentage (stub)",
+      "description": "Percentage string: number followed by % (e.g. \"50%\", \"-10.5%\").\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"Percentage\"] }"
+    },
+    "GradientShadeOptions": {
+      "title": "GradientShadeOptions (stub)",
+      "description": "Gradient shade options (linear or path).\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"GradientShadeOptions\"] }"
+    },
+    "PathShadeOptions": {
+      "title": "PathShadeOptions (stub)",
+      "description": "Options for path (radial) gradient shading.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"PathShadeOptions\"] }"
+    },
+    "PathShade": {
+      "title": "PathShade (stub)",
+      "description": "Path shade type for radial gradients.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"PathShade\"] }"
+    },
+    "LinearShadeOptions": {
+      "title": "LinearShadeOptions (stub)",
+      "description": "Options for linear gradient shading.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"LinearShadeOptions\"] }"
+    },
+    "EffectListOptions": {
+      "title": "EffectListOptions (stub)",
+      "description": "Options for the effect list container.\n\nEach property corresponds to an optional child effect element. Only specified effects will be included in the output.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"EffectListOptions\"] }"
+    },
+    "ReflectionEffectOptions": {
+      "title": "ReflectionEffectOptions (stub)",
+      "description": "Options for reflection effect.\n\nAll properties are optional with XSD defaults.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"ReflectionEffectOptions\"] }"
+    },
+    "PresetShadowEffectOptions": {
+      "title": "PresetShadowEffectOptions (stub)",
+      "description": "Options for preset shadow effect.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"PresetShadowEffectOptions\"] }"
+    },
+    "PresetShadow": {
+      "title": "PresetShadow (stub)",
+      "description": "Preset shadow geometry (`shadow1` through `shadow20`).\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"PresetShadow\"] }"
+    },
+    "OuterShadowEffectOptions": {
+      "title": "OuterShadowEffectOptions (stub)",
+      "description": "Options for outer shadow effect.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"OuterShadowEffectOptions\"] }"
+    },
+    "RectAlignment": {
+      "title": "RectAlignment (stub)",
+      "description": "Rectangle alignment for shadow positioning.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"RectAlignment\"] }"
+    },
+    "InnerShadowEffectOptions": {
+      "title": "InnerShadowEffectOptions (stub)",
+      "description": "Options for inner shadow effect.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"InnerShadowEffectOptions\"] }"
+    },
+    "GlowEffectOptions": {
+      "title": "GlowEffectOptions (stub)",
+      "description": "Options for glow effect.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"GlowEffectOptions\"] }"
+    },
+    "FillOverlayEffectOptions": {
+      "title": "FillOverlayEffectOptions (stub)",
+      "description": "Options for fill overlay effect.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"FillOverlayEffectOptions\"] }"
+    },
+    "BlurEffectOptions": {
+      "title": "BlurEffectOptions (stub)",
+      "description": "Blur effect options.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"BlurEffectOptions\"] }"
+    },
+    "BlackWhiteMode": {
+      "title": "BlackWhiteMode (stub)",
+      "description": "the 11 token values for the `@bwMode` attribute.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"BlackWhiteMode\"] }"
+    },
+    "TextFontOptions": {
+      "additionalProperties": false,
+      "description": "Single font slot — a:latin / a:ea / a:cs / a:sym.",
+      "properties": {
+        "charset": {
+          "type": "number"
+        },
+        "panose": {
+          "$ref": "#/definitions/Panose"
+        },
+        "pitchFamily": {
+          "type": "number"
+        },
+        "typeface": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "typeface"
+      ],
+      "type": "object"
+    },
+    "Panose": {
+      "title": "Panose (stub)",
+      "description": "20-digit hex Panose-1 font classification (ST_Panose).\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"Panose\"] }"
+    },
+    "TableOptions": {
+      "additionalProperties": false,
+      "description": "Table (p:graphicFrame with a:tbl) for pptx slides. Structural base (rows/columnWidths/6-flags) from BaseTableOptions; cNvPr fields from NonVisualDrawingPropertiesOptions.",
+      "properties": {
+        "bandCol": {
+          "type": "boolean"
+        },
+        "bandRow": {
+          "type": "boolean"
+        },
+        "borders": {
+          "additionalProperties": false,
+          "properties": {
+            "bottom": {
+              "$ref": "#/definitions/CellBorderOptions"
+            },
+            "left": {
+              "$ref": "#/definitions/CellBorderOptions"
+            },
+            "right": {
+              "$ref": "#/definitions/CellBorderOptions"
+            },
+            "top": {
+              "$ref": "#/definitions/CellBorderOptions"
+            }
+          },
+          "type": "object"
+        },
+        "columnIds": {
+          "description": "Office 2014 column stamps (a16:colId per a:gridCol extension list), parallel to `BaseTableOptions.columnWidths` — round-trip.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "columnWidths": {
+          "description": "Column widths. `number` is the package's native unit (docx twip, pptx EMU); `PositiveUniversalMeasure` is consistent across packages. Cross-format conversion translates the native unit.",
+          "items": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "$ref": "#/definitions/PositiveUniversalMeasure"
+              }
+            ]
+          },
+          "type": "array"
+        },
+        "creationId": {
+          "$ref": "#/definitions/Guid",
+          "description": "a16:creationId `@id` from the cNvPr/docPr extension list — Office's per-object creation stamp, the sole known cNvPr ext content."
+        },
+        "creationIdExtension": {
+          "description": "Verbatim `a:ext` carrying a16:creationId; preserves producer-specific namespace declarations and attributes that `creationId` alone omits.",
+          "type": "string"
+        },
+        "customerData": {
+          "description": "Customer-data references (p:nvPr > p:custDataLst > p:tags/p:custData).",
+          "items": {
+            "$ref": "#/definitions/SlideCustomerDataReferenceOptions"
+          },
+          "type": "array"
+        },
+        "description": {
+          "description": "XSD `@descr` — alt text for accessibility; emitted only when present.",
+          "type": "string"
+        },
+        "effects": {
+          "$ref": "#/definitions/EffectListOptions",
+          "description": "Table-level effect list (a:tblPr/a:effectLst) — round-trip."
+        },
+        "ext": {
+          "description": "Verbatim `a:extLst` inner XML for extensions beyond creationId (a14 picture effects, useLocalDpi, …). Round-trip only: takes precedence over `creationId`, which it subsumes when the source list carries both.",
+          "readOnly": true,
+          "type": "string"
+        },
+        "fill": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/FillOptions"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Table-level fill (a:tblPr/a:solidFill etc.) — round-trip."
+        },
+        "firstCol": {
+          "type": "boolean"
+        },
+        "firstRow": {
+          "description": "Apply first-row conditional formatting (docx w:tblLook@firstRow, pptx a:tblPr@firstRow).",
+          "type": "boolean"
+        },
+        "hasCustomPrompt": {
+          "type": "boolean"
+        },
+        "height": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "$ref": "#/definitions/UniversalMeasure"
+            }
+          ]
+        },
+        "hidden": {
+          "description": "XSD `@hidden` (default false); emitted as \"1\" only when true.",
+          "type": "boolean"
+        },
+        "hyperlink": {
+          "$ref": "#/definitions/TextHyperlinkOptions",
+          "description": "Click hyperlink (a:hlinkClick inside p:cNvPr)."
+        },
+        "id": {
+          "description": "Table id (p:cNvPr `@id`). Auto-generated if omitted.",
+          "type": "number"
+        },
+        "isPhoto": {
+          "description": "p:nvPr `@isPhoto`.",
+          "type": "boolean"
+        },
+        "lastCol": {
+          "type": "boolean"
+        },
+        "lastRow": {
+          "type": "boolean"
+        },
+        "locking": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/GraphicFrameLockingOptions"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Frame locking (a:graphicFrameLocks). undefined = fresh default (noGrp=\"1\"); null = empty cNvGraphicFramePr; object = explicit flags."
+        },
+        "modId": {
+          "description": "p14:modId `@val` from the nvPr extension list — Office's collaboration modification stamp.",
+          "type": "string"
+        },
+        "name": {
+          "description": "XSD `@name` (required in XML); API-optional, the descriptor synthesizes a fallback.",
+          "type": "string"
+        },
+        "nvPrExtensions": {
+          "description": "Unknown application extensions (`p:nvPr/p:extLst`); `[]` preserves an empty list.",
+          "items": {
+            "$ref": "#/definitions/NvPrExtensionOptions"
+          },
+          "type": "array"
+        },
+        "placeholder": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/PlaceholderType"
+            },
+            {
+              "const": true,
+              "type": "boolean"
+            }
+          ],
+          "description": "`@type` —."
+        },
+        "placeholderIndex": {
+          "description": "`@idx`.",
+          "type": "number"
+        },
+        "placeholderOrientation": {
+          "$ref": "#/definitions/PlaceholderOrientation",
+          "description": "`@orient` — orientation hint (default \"horz\")."
+        },
+        "placeholderSize": {
+          "$ref": "#/definitions/PlaceholderSize",
+          "description": "`@sz` — sizing hint (default \"full\")."
+        },
+        "rightToLeft": {
+          "description": "`@rtl` — table cell order is right-to-left.",
+          "type": "boolean"
+        },
+        "rows": {
+          "items": {
+            "$ref": "#/definitions/TableRowOptions"
+          },
+          "type": "array"
+        },
+        "tableStyle": {
+          "$ref": "#/definitions/TableStyleOptions",
+          "description": "Inline table style (a:tableStyle in a:tblPr) — alternative to tableStyleId."
+        },
+        "tableStyleId": {
+          "$ref": "#/definitions/Guid"
+        },
+        "title": {
+          "description": "XSD `@title`.",
+          "type": "string"
+        },
+        "userDrawn": {
+          "description": "p:nvPr `@userDrawn`.",
+          "type": "boolean"
+        },
+        "width": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "$ref": "#/definitions/UniversalMeasure"
+            }
+          ]
+        },
+        "x": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "$ref": "#/definitions/UniversalMeasure"
+            }
+          ]
+        },
+        "y": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "$ref": "#/definitions/UniversalMeasure"
+            }
+          ]
+        }
+      },
+      "required": [
+        "rows"
+      ],
+      "type": "object"
+    },
+    "TableStyleOptions": {
+      "title": "TableStyleOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"TableStyleOptions\"] }"
+    },
+    "TablePartStyleOptions": {
+      "title": "TablePartStyleOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"TablePartStyleOptions\"] }"
+    },
+    "TableTextStyleOptions": {
+      "title": "TableTextStyleOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"TableTextStyleOptions\"] }"
+    },
+    "TableFontReferenceOptions": {
+      "title": "TableFontReferenceOptions (stub)",
+      "description": "Font reference — a:fontRef. Unlike lnRef/fillRef/effectRef, its\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"TableFontReferenceOptions\"] }"
+    },
+    "OnOffStyleType": {
+      "title": "OnOffStyleType (stub)",
+      "description": "Style-part on/off state.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"OnOffStyleType\"] }"
+    },
+    "TableCellStyleOptions": {
+      "title": "TableCellStyleOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"TableCellStyleOptions\"] }"
+    },
+    "Cell3DOptions": {
+      "title": "Cell3DOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"Cell3DOptions\"] }"
+    },
+    "PresetMaterial": {
+      "title": "PresetMaterial (stub)",
+      "description": "Preset material used to shade a 3D shape (`matte`, `metal`, `flat`, etc.).\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"PresetMaterial\"] }"
+    },
+    "LightRigOptions": {
+      "title": "LightRigOptions (stub)",
+      "description": "Light rig options. Defines the lighting setup for the 3D scene.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"LightRigOptions\"] }"
+    },
+    "SphereCoords": {
+      "title": "SphereCoords (stub)",
+      "description": "Sphere coordinates. Used for camera and light rig rotation. All angles are in degrees.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"SphereCoords\"] }"
+    },
+    "LightRigType": {
+      "title": "LightRigType (stub)",
+      "description": "Light rig preset.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"LightRigType\"] }"
+    },
+    "LightRigDirection": {
+      "title": "LightRigDirection (stub)",
+      "description": "Light direction — full words; XSD tokens topLeft→tl etc.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"LightRigDirection\"] }"
+    },
+    "BevelOptions": {
+      "title": "BevelOptions (stub)",
+      "description": "Options for a bevel element.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"BevelOptions\"] }"
+    },
+    "BevelPreset": {
+      "title": "BevelPreset (stub)",
+      "description": "Bevel preset type (`circle`, `softRound`, `slope`, and related presets).\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"BevelPreset\"] }"
+    },
+    "TableCellBorderOptions": {
+      "title": "TableCellBorderOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"TableCellBorderOptions\"] }"
+    },
+    "ThemeableLineStyleOptions": {
+      "title": "ThemeableLineStyleOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"ThemeableLineStyleOptions\"] }"
+    },
+    "LineJoin": {
+      "title": "LineJoin (stub)",
+      "description": "Line join styles.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"LineJoin\"] }"
+    },
+    "LineEndOptions": {
+      "title": "LineEndOptions (stub)",
+      "description": "Options for line end (arrow) properties.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"LineEndOptions\"] }"
+    },
+    "LineEndWidth": {
+      "title": "LineEndWidth (stub)",
+      "description": "Line end width options.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"LineEndWidth\"] }"
+    },
+    "LineEndType": {
+      "title": "LineEndType (stub)",
+      "description": "Line end types (arrow head styles).\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"LineEndType\"] }"
+    },
+    "LineEndLength": {
+      "title": "LineEndLength (stub)",
+      "description": "Line end length options.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"LineEndLength\"] }"
+    },
+    "PresetDash": {
+      "title": "PresetDash (stub)",
+      "description": "Preset dash styles for outlines.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"PresetDash\"] }"
+    },
+    "DashStop": {
+      "title": "DashStop (stub)",
+      "description": "A single dash stop in a custom dash pattern. `` is a string matching `[0-9]+(\\.[0-9]+)?%` (e.g., `\"100%\"`, `\"500%\"`, `\"50.5%\"`).\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"DashStop\"] }"
+    },
+    "PositivePercentage": {
+      "title": "PositivePercentage (stub)",
+      "description": "Positive percentage string: number followed by %.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"PositivePercentage\"] }"
+    },
+    "CompoundLine": {
+      "title": "CompoundLine (stub)",
+      "description": "Compound line types for outlines.\n\nDefines the structure of compound lines (single, double, etc.).\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"CompoundLine\"] }"
+    },
+    "LineCap": {
+      "title": "LineCap (stub)",
+      "description": "Line cap styles for outline endpoints.\n\nDefines how the ends of a line are rendered.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"LineCap\"] }"
+    },
+    "PenAlignment": {
+      "title": "PenAlignment (stub)",
+      "description": "Pen alignment options for outline positioning.\n\nDefines how the outline is aligned relative to the shape edge.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"PenAlignment\"] }"
+    },
+    "TableBackgroundStyleOptions": {
+      "title": "TableBackgroundStyleOptions (stub)",
+      "description": "Table background style.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"TableBackgroundStyleOptions\"] }"
+    },
+    "TableRowOptions": {
+      "title": "TableRowOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"TableRowOptions\"] }"
+    },
+    "TableCellOptions": {
+      "title": "TableCellOptions (stub)",
+      "description": "pptx cell extends the base cell contract (span from base); verticalAlign widens to the DrawingML anchor set (justify/distribute) and fill/borders/ margins/content are a:-domain types.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"TableCellOptions\"] }"
+    },
+    "VerticalAnchor": {
+      "title": "VerticalAnchor (stub)",
+      "description": "Text anchoring type.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"VerticalAnchor\"] }"
+    },
+    "TextVertical": {
+      "title": "TextVertical (stub)",
+      "description": "Text vertical type.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"TextVertical\"] }"
+    },
+    "TextHorzOverflow": {
+      "title": "TextHorzOverflow (stub)",
+      "description": "Text horizontal overflow type.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"TextHorzOverflow\"] }"
+    },
+    "ParagraphDescriptorOptions": {
+      "title": "ParagraphDescriptorOptions (stub)",
+      "description": "Descriptor-layer paragraph accumulator (a:p).\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"ParagraphDescriptorOptions\"] }"
+    },
+    "TextParagraphPropertiesOptions": {
+      "title": "TextParagraphPropertiesOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"TextParagraphPropertiesOptions\"] }"
+    },
+    "TabStopOptions": {
+      "title": "TabStopOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"TabStopOptions\"] }"
+    },
+    "TextTabAlignment": {
+      "title": "TextTabAlignment (stub)",
+      "description": "Tab-stop alignment.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"TextTabAlignment\"] }"
+    },
+    "TextCharacterPropertiesOptions": {
+      "title": "TextCharacterPropertiesOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"TextCharacterPropertiesOptions\"] }"
+    },
+    "UnderlineStyle": {
+      "title": "UnderlineStyle (stub)",
+      "description": "Underline.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"UnderlineStyle\"] }"
+    },
+    "StrikeStyle": {
+      "title": "StrikeStyle (stub)",
+      "description": "Strikethrough. Friendly spellings; xsdStrikeStyle maps them to the XML tokens.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"StrikeStyle\"] }"
+    },
+    "OutlineOptions": {
+      "title": "OutlineOptions (stub)",
+      "description": "Complete outline configuration options.\n\nCombines outline attributes with fill properties.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"OutlineOptions\"] }"
+    },
+    "PatternFillOptions": {
+      "title": "PatternFillOptions (stub)",
+      "description": "Options for pattern fill.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"PatternFillOptions\"] }"
+    },
+    "TextHyperlinkOptions": {
+      "title": "TextHyperlinkOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"TextHyperlinkOptions\"] }"
+    },
+    "HyperlinkSoundOptions": {
+      "title": "HyperlinkSoundOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"HyperlinkSoundOptions\"] }"
+    },
+    "RunFont": {
+      "title": "RunFont (stub)",
+      "description": "Run font scripts. A bare string sets latin + ea to the same typeface (the common case); the object form sets each script independently.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"RunFont\"] }"
+    },
+    "TextFont": {
+      "title": "TextFont (stub)",
+      "description": "A script typeface. A bare string is the typeface only; the full object carries panose/pitchFamily/charset for embedded font metrics.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"TextFont\"] }"
+    },
+    "TextCapitalization": {
+      "title": "TextCapitalization (stub)",
+      "description": "Case effect: \"all\" ALL CAPS, \"small\" Small Caps, \"none\".\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"TextCapitalization\"] }"
+    },
+    "BulletStyleOptions": {
+      "title": "BulletStyleOptions (stub)",
+      "description": "Shared bullet color/size/font styling (EG_TextBulletColorSizeFont). Each dimension is a choice: an explicit value, a \"follows text\" toggle, or unset.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"BulletStyleOptions\"] }"
+    },
+    "TextAlignment": {
+      "title": "TextAlignment (stub)",
+      "description": "Paragraph alignment; \"justify\" stretches lines to full width, \"distribute\" justifies including the last line, \"lowJustification\" aligns to a low baseline, \"thaiDistributed\" is Thai-style distribution.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"TextAlignment\"] }"
+    },
+    "MathParagraphOptions": {
+      "title": "MathParagraphOptions (stub)",
+      "description": "A14 math paragraph (a14:m). Content is the m:oMathPara subtree.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"MathParagraphOptions\"] }"
+    },
+    "TextBreakOptions": {
+      "title": "TextBreakOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"TextBreakOptions\"] }"
+    },
+    "TextFieldOptions": {
+      "title": "TextFieldOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"TextFieldOptions\"] }"
+    },
+    "TextRunOptions": {
+      "additionalProperties": false,
+      "properties": {
+        "alternateLanguage": {
+          "type": "string"
+        },
+        "baseline": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "$ref": "#/definitions/Percentage"
+            }
+          ],
+          "description": "Character baseline as integer percent (`30` = 30%) or verbatim `\"30%\"`."
+        },
+        "bold": {
+          "type": "boolean"
+        },
+        "bookmarkMark": {
+          "type": "string"
+        },
+        "capitalization": {
+          "$ref": "#/definitions/TextCapitalization"
+        },
+        "dirty": {
+          "type": "boolean"
+        },
+        "effectDag": {
+          "description": "Verbatim a:effectDag element for effect containers. Round-trip channel: captured from a parsed source; do not hand-author.",
+          "type": "string"
+        },
+        "emptyProperties": {
+          "description": "The source carried a bare `<a:rPr/>` with no attributes or children. Round-trip marker only — re-emits the empty element instead of dropping it (element presence is part of the source's fidelity).",
+          "type": "boolean"
+        },
+        "err": {
+          "description": "`@err` — spelling error flag.",
+          "type": "boolean"
+        },
+        "fill": {
+          "$ref": "#/definitions/FillOptions"
+        },
+        "font": {
+          "$ref": "#/definitions/RunFont"
+        },
+        "highlight": {
+          "$ref": "#/definitions/SolidFillOptions",
+          "description": "a:highlight — text highlight color."
+        },
+        "hyperlink": {
+          "$ref": "#/definitions/TextHyperlinkOptions"
+        },
+        "italic": {
+          "type": "boolean"
+        },
+        "kern": {
+          "description": "`@kern` — kerning threshold in points.",
+          "type": "number"
+        },
+        "kumimoji": {
+          "type": "boolean"
+        },
+        "lang": {
+          "type": "string"
+        },
+        "mouseoverHyperlink": {
+          "$ref": "#/definitions/TextHyperlinkOptions",
+          "description": "a:hlinkMouseOver — hover hyperlink."
+        },
+        "noProof": {
+          "type": "boolean"
+        },
+        "normalizeHeight": {
+          "type": "boolean"
+        },
+        "outline": {
+          "anyOf": [
+            {
+              "const": true,
+              "type": "boolean"
+            },
+            {
+              "$ref": "#/definitions/OutlineOptions"
+            }
+          ],
+          "description": "a:ln. `true` emits a sane default; a full OutlineOptions round-trips."
+        },
+        "rightToLeft": {
+          "type": "boolean"
+        },
+        "shadow": {
+          "anyOf": [
+            {
+              "const": true,
+              "type": "boolean"
+            },
+            {
+              "$ref": "#/definitions/EffectListOptions"
+            }
+          ],
+          "description": "a:effectLst (EG_EffectProperties). `true` emits a default outer shadow; a full EffectListOptions round-trips."
+        },
+        "size": {
+          "description": "Font size in points. Serialized as OOXML a:sz (hundredths of a point).",
+          "type": "number"
+        },
+        "smartTagId": {
+          "description": "`@smtId` — smart tag id.",
+          "type": "number"
+        },
+        "smtClean": {
+          "description": "`@smtClean` — smart tag clean flag (XSD default true).",
+          "type": "boolean"
+        },
+        "spacing": {
+          "description": "Character spacing in points (a:spc).",
+          "type": "number"
+        },
+        "strike": {
+          "$ref": "#/definitions/StrikeStyle"
+        },
+        "text": {
+          "type": "string"
+        },
+        "underline": {
+          "$ref": "#/definitions/UnderlineStyle"
+        },
+        "underlineFill": {
+          "anyOf": [
+            {
+              "const": true,
+              "type": "boolean"
+            },
+            {
+              "$ref": "#/definitions/FillOptions"
+            }
+          ],
+          "description": "EG_TextUnderlineFill — underline fill. `true` = a:uFillTx (follow the text fill); a FillOptions = a:uFill."
+        },
+        "underlineLine": {
+          "anyOf": [
+            {
+              "const": true,
+              "type": "boolean"
+            },
+            {
+              "$ref": "#/definitions/OutlineOptions"
+            }
+          ],
+          "description": "EG_TextUnderlineLine — underline line. `true` = a:uLnTx (follow the text line); an OutlineOptions = a:uLn."
+        }
+      },
+      "type": "object"
+    },
+    "CellBorderOptions": {
+      "title": "CellBorderOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"CellBorderOptions\"] }"
+    },
+    "BodyPropertiesOptions": {
+      "title": "BodyPropertiesOptions (stub)",
+      "description": "Options for text body properties. XSD content model: prstTxWarp?, EG_TextAutofit?, scene3d?, EG_Text3D? followed by 19 attributes.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"BodyPropertiesOptions\"] }"
+    },
+    "TextBodyWrapping": {
+      "title": "TextBodyWrapping (stub)",
+      "description": "Text body wrapping type.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"TextBodyWrapping\"] }"
+    },
+    "TextVertOverflow": {
+      "title": "TextVertOverflow (stub)",
+      "description": "Text vertical overflow type.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"TextVertOverflow\"] }"
+    },
+    "Shape3DOptions": {
+      "title": "Shape3DOptions (stub)",
+      "description": "Options for 3D shape properties.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"Shape3DOptions\"] }"
+    },
+    "Scene3DOptions": {
+      "title": "Scene3DOptions (stub)",
+      "description": "Options for a 3D scene. Both `camera` and `lightRig` are required. `backdrop` is optional.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"Scene3DOptions\"] }"
+    },
+    "CameraOptions": {
+      "title": "CameraOptions (stub)",
+      "description": "Camera options. Defines the camera type and optional rotation for the 3D scene.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"CameraOptions\"] }"
+    },
+    "CameraPreset": {
+      "title": "CameraPreset (stub)",
+      "description": "Preset camera type.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"CameraPreset\"] }"
+    },
+    "BackdropOptions": {
+      "title": "BackdropOptions (stub)",
+      "description": "Backdrop options. Defines the backdrop plane for the 3D scene.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"BackdropOptions\"] }"
+    },
+    "Vector3D": {
+      "title": "Vector3D (stub)",
+      "description": "3D vector.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"Vector3D\"] }"
+    },
+    "Point3D": {
+      "title": "Point3D (stub)",
+      "description": "3D point.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"Point3D\"] }"
+    },
+    "PresetTextShapeOptions": {
+      "title": "PresetTextShapeOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"PresetTextShapeOptions\"] }"
+    },
+    "TextShapePreset": {
+      "title": "TextShapePreset (stub)",
+      "description": "Preset text shape — the warp geometry applied to a text body (a:prstTxWarp `@prst`).\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"TextShapePreset\"] }"
+    },
+    "NormalAutofitOptions": {
+      "title": "NormalAutofitOptions (stub)",
+      "description": "Normal autofit options.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"NormalAutofitOptions\"] }"
+    },
+    "FlatTextOptions": {
+      "title": "FlatTextOptions (stub)",
+      "description": "Flat text options.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"FlatTextOptions\"] }"
+    },
+    "PlaceholderSize": {
+      "title": "PlaceholderSize (stub)",
+      "description": "`@sz` — sizing hint.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"PlaceholderSize\"] }"
+    },
+    "PlaceholderOrientation": {
+      "title": "PlaceholderOrientation (stub)",
+      "description": "`@orient` — orientation hint.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"PlaceholderOrientation\"] }"
+    },
+    "PlaceholderType": {
+      "title": "PlaceholderType (stub)",
+      "description": "`@type` —.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"PlaceholderType\"] }"
+    },
+    "NvPrExtensionOptions": {
+      "title": "NvPrExtensionOptions (stub)",
+      "description": "One application extension (`p:ext`) inside `p:nvPr/p:extLst`.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"NvPrExtensionOptions\"] }"
+    },
+    "GraphicFrameLockingOptions": {
+      "title": "GraphicFrameLockingOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"GraphicFrameLockingOptions\"] }"
+    },
+    "SlideCustomerDataReferenceOptions": {
+      "title": "SlideCustomerDataReferenceOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"SlideCustomerDataReferenceOptions\"] }"
+    },
+    "Guid": {
+      "title": "Guid (stub)",
+      "description": "GUID in braced upper-case form (ST_Guid).\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"Guid\"] }"
+    },
+    "PositiveUniversalMeasure": {
+      "title": "PositiveUniversalMeasure (stub)",
+      "description": "Positive measurement string: number followed by mm, cm, in, pt, pc or pi.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"PositiveUniversalMeasure\"] }"
+    },
+    "TextBodyOptions": {
+      "additionalProperties": false,
+      "properties": {
+        "anchor": {
+          "$ref": "#/definitions/VerticalAnchor",
+          "description": "Convenience sugar — merged into `bodyProperties` on stringify (explicit `bodyProperties` fields take precedence). Input-only: parse always emits the normalized `bodyProperties` form. Mirrors the `fill` descriptor's string-sugar convention."
+        },
+        "autoFit": {
+          "description": "Sugar → `bodyProperties.normAutofit` (`\"normal\"`) / `spAutoFit` (`\"shape\"`).",
+          "enum": [
+            "normal",
+            "shape"
+          ],
+          "type": "string"
+        },
+        "bodyProperties": {
+          "$ref": "#/definitions/BodyPropertiesOptions"
+        },
+        "columnSpacing": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "$ref": "#/definitions/UniversalMeasure"
+            }
+          ],
+          "description": "Sugar → `bodyProperties.spcCol`."
+        },
+        "columns": {
+          "description": "Sugar → `bodyProperties.numCol`.",
+          "type": "number"
+        },
+        "listStyle": {
+          "$ref": "#/definitions/TextListStyleOptions"
+        },
+        "margins": {
+          "additionalProperties": false,
+          "description": "Sugar → `bodyProperties.margins`.",
+          "properties": {
+            "bottom": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "$ref": "#/definitions/UniversalMeasure"
+                }
+              ]
+            },
+            "left": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "$ref": "#/definitions/UniversalMeasure"
+                }
+              ]
+            },
+            "right": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "$ref": "#/definitions/UniversalMeasure"
+                }
+              ]
+            },
+            "top": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "$ref": "#/definitions/UniversalMeasure"
+                }
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "paragraphs": {
+          "description": "Paragraph list; string entries expand to a one-run paragraph.",
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/ParagraphDescriptorOptions"
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "type": "array"
+        },
+        "text": {
+          "description": "Single-paragraph shorthand; expands to one paragraph on stringify.",
+          "type": "string"
+        },
+        "vertical": {
+          "$ref": "#/definitions/TextVertical",
+          "description": "Sugar → `bodyProperties.vertical`."
+        },
+        "wrap": {
+          "$ref": "#/definitions/TextBodyWrapping",
+          "description": "Sugar → `bodyProperties.wrap`."
+        }
+      },
+      "type": "object"
+    },
+    "ShapeOptions": {
+      "additionalProperties": false,
+      "properties": {
+        "blackWhiteMode": {
+          "$ref": "#/definitions/BlackWhiteMode",
+          "description": "`@bwMode` on `p:spPr` — how the shape renders in black-and-white view/print."
+        },
+        "controlId": {
+          "description": "Drawing control reference (`draw:control`); absent for ordinary presentation shapes.",
+          "type": "string"
+        },
+        "creationId": {
+          "$ref": "#/definitions/Guid",
+          "description": "a16:creationId `@id` from the cNvPr/docPr extension list — Office's per-object creation stamp, the sole known cNvPr ext content."
+        },
+        "creationIdExtension": {
+          "description": "Verbatim `a:ext` carrying a16:creationId; preserves producer-specific namespace declarations and attributes that `creationId` alone omits.",
+          "type": "string"
+        },
+        "customerData": {
+          "description": "Customer-data references (`p:nvPr/p:custDataLst`), including `p:tags`.",
+          "items": {
+            "$ref": "#/definitions/SlideCustomerDataReferenceOptions"
+          },
+          "type": "array"
+        },
+        "description": {
+          "description": "XSD `@descr` — alt text for accessibility; emitted only when present.",
+          "type": "string"
+        },
+        "ext": {
+          "description": "Verbatim `a:extLst` inner XML for extensions beyond creationId (a14 picture effects, useLocalDpi, …). Round-trip only: takes precedence over `creationId`, which it subsumes when the source list carries both.",
+          "readOnly": true,
+          "type": "string"
+        },
+        "flipHorizontal": {
+          "type": "boolean"
+        },
+        "flipVertical": {
+          "type": "boolean"
+        },
+        "hasCustomPrompt": {
+          "type": "boolean"
+        },
+        "height": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "$ref": "#/definitions/UniversalMeasure"
+            }
+          ],
+          "description": "Height in EMUs (`914400` = 1\") or a universal measure."
+        },
+        "hidden": {
+          "description": "XSD `@hidden` (default false); emitted as \"1\" only when true.",
+          "type": "boolean"
+        },
+        "hyperlink": {
+          "$ref": "#/definitions/TextHyperlinkOptions",
+          "description": "Click hyperlink on the shape itself (a:hlinkClick inside p:cNvPr) — jump to a URL or another slide when the shape is clicked."
+        },
+        "id": {
+          "type": "number"
+        },
+        "isPhoto": {
+          "type": "boolean"
+        },
+        "locking": {
+          "$ref": "#/definitions/ShapeLockingOptions"
+        },
+        "name": {
+          "description": "XSD `@name` (required in XML); API-optional, the descriptor synthesizes a fallback.",
+          "type": "string"
+        },
+        "nvPrExtensions": {
+          "description": "Application non-visual drawing extensions (`p:nvPr/p:extLst/p:ext`).",
+          "items": {
+            "$ref": "#/definitions/NvPrExtensionOptions"
+          },
+          "type": "array"
+        },
+        "odfGeometryType": {
+          "description": "Exact source ODF draw:type; used only when regenerating ODF shapes.",
+          "type": "string"
+        },
+        "placeholder": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/PlaceholderType"
+            },
+            {
+              "const": true,
+              "type": "boolean"
+            }
+          ],
+          "description": "`@type` —."
+        },
+        "placeholderIndex": {
+          "type": "number"
+        },
+        "placeholderOrientation": {
+          "description": "`@orient` — orientation hint (default \"horz\").",
+          "enum": [
+            "horz",
+            "vert"
+          ],
+          "type": "string"
+        },
+        "placeholderSize": {
+          "description": "`@sz` — sizing hint (default \"full\").",
+          "enum": [
+            "full",
+            "half",
+            "quarter"
+          ],
+          "type": "string"
+        },
+        "properties": {
+          "additionalProperties": false,
+          "description": "Shape properties (a:spPr children): geometry/fill/outline/effects/3D and the spPr extension list. Transform fields stay top-level on the shape. `fill: null` marks a source spPr with no fill child — absence is the fidelity (the shape inherits its fill), so stringify emits nothing instead of the fresh-authoring noFill default.",
+          "properties": {
+            "customGeometry": {
+              "$ref": "#/definitions/CustomGeometryOptions"
+            },
+            "effectDag": {
+              "$ref": "#/definitions/EffectDagOptions"
+            },
+            "effects": {
+              "$ref": "#/definitions/EffectListOptions"
+            },
+            "ext": {
+              "description": "Raw a:extLst inner XML. Prefer `extensions` for structured shape-property extensions; retained for existing callers and unmodeled payloads.",
+              "type": "string"
+            },
+            "extensions": {
+              "description": "Shape-property extensions (a:extLst/a:ext).",
+              "items": {
+                "$ref": "#/definitions/ShapePropertiesExtensionOptions"
+              },
+              "type": "array"
+            },
+            "fill": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/FillOptions"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "geometry": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/ShapeType"
+                },
+                {
+                  "$ref": "#/definitions/PresetGeometryOptions"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "outline": {
+              "$ref": "#/definitions/OutlineOptions"
+            },
+            "scene3d": {
+              "$ref": "#/definitions/Scene3DOptions"
+            },
+            "shape3d": {
+              "$ref": "#/definitions/Shape3DOptions"
+            },
+            "transformPresent": {
+              "description": "Source `a:xfrm` presence; `true` preserves an explicit empty transform.",
+              "type": "boolean"
+            }
+          },
+          "type": "object"
+        },
+        "rotation": {
+          "description": "Rotation angle in degrees (e.g., 45 = 45°).",
+          "type": "number"
+        },
+        "style": {
+          "$ref": "#/definitions/ShapeStyleOptions"
+        },
+        "textBody": {
+          "$ref": "#/definitions/TextBodyOptions"
+        },
+        "textBox": {
+          "description": "Text-box marker (`p:cNvSpPr/@txBox`); omit for fresh authoring, set `false` only to preserve an explicit source marker.",
+          "type": "boolean"
+        },
+        "title": {
+          "description": "XSD `@title`.",
+          "type": "string"
+        },
+        "useBackgroundFill": {
+          "type": "boolean"
+        },
+        "userDrawn": {
+          "type": "boolean"
+        },
+        "width": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "$ref": "#/definitions/UniversalMeasure"
+            }
+          ],
+          "description": "Width in EMUs (`914400` = 1\") or a universal measure."
+        },
+        "x": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "$ref": "#/definitions/UniversalMeasure"
+            }
+          ],
+          "description": "Horizontal offset in EMUs (`914400` = 1\") or a universal measure."
+        },
+        "y": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "$ref": "#/definitions/UniversalMeasure"
+            }
+          ],
+          "description": "Vertical offset in EMUs (`914400` = 1\") or a universal measure."
+        }
+      },
+      "type": "object"
+    },
+    "ShapeStyleOptions": {
+      "title": "ShapeStyleOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"ShapeStyleOptions\"] }"
+    },
+    "StyleReferenceColor": {
+      "title": "StyleReferenceColor (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"StyleReferenceColor\"] }"
+    },
+    "ShapeStyleReferenceOptions": {
+      "title": "ShapeStyleReferenceOptions (stub)",
+      "description": "A style-matrix reference: an index into the theme's style matrix plus an optional color override.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"ShapeStyleReferenceOptions\"] }"
+    },
+    "PresetGeometryOptions": {
+      "title": "PresetGeometryOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"PresetGeometryOptions\"] }"
+    },
+    "ShapeType": {
+      "title": "ShapeType (stub)",
+      "description": "Preset shape tokens (a:prstGeom `@prst`, — dml-main.xsd, 187 values verbatim). The arrows, flowChart*, and actionButton* families round out the set.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"ShapeType\"] }"
+    },
+    "GeometryGuide": {
+      "title": "GeometryGuide (stub)",
+      "description": "A single geometry guide that defines an adjustment value.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"GeometryGuide\"] }"
+    },
+    "ShapePropertiesExtensionOptions": {
+      "title": "ShapePropertiesExtensionOptions (stub)",
+      "description": "A shape-property extension (a:ext). Known Office extensions are structured; unknown payloads remain verbatim in `content`.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"ShapePropertiesExtensionOptions\"] }"
+    },
+    "CustomGeometryOptions": {
+      "title": "CustomGeometryOptions (stub)",
+      "description": "Options for a custom 2D geometry. Only `pathList` is required. All other sub-elements are optional.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"CustomGeometryOptions\"] }"
+    },
+    "GeomRect": {
+      "title": "GeomRect (stub)",
+      "description": "Text insertion rectangle. Defines the rectangle within the shape where text is placed. Coordinates can be absolute values or references to geometry guide names.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"GeomRect\"] }"
+    },
+    "PathOptions": {
+      "title": "PathOptions (stub)",
+      "description": "Options for a 2D path.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"PathOptions\"] }"
+    },
+    "PathFillMode": {
+      "title": "PathFillMode (stub)",
+      "description": "Path fill mode. Note: the `\"normal\"` value here maps to the XSD `norm` token.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"PathFillMode\"] }"
+    },
+    "PathCommand": {
+      "title": "PathCommand (stub)",
+      "description": "A path command within a custom geometry path.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"PathCommand\"] }"
+    },
+    "PathClose": {
+      "title": "PathClose (stub)",
+      "description": "Close path command.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"PathClose\"] }"
+    },
+    "PathCubicBezTo": {
+      "title": "PathCubicBezTo (stub)",
+      "description": "Cubic Bezier-to path command.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"PathCubicBezTo\"] }"
+    },
+    "AdjustPoint": {
+      "title": "AdjustPoint (stub)",
+      "description": "An adjustable point. Coordinates can be absolute values or references to geometry guide names.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"AdjustPoint\"] }"
+    },
+    "PathQuadBezTo": {
+      "title": "PathQuadBezTo (stub)",
+      "description": "Quadratic Bezier-to path command.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"PathQuadBezTo\"] }"
+    },
+    "PathArcTo": {
+      "title": "PathArcTo (stub)",
+      "description": "Arc-to path command.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"PathArcTo\"] }"
+    },
+    "PathLineTo": {
+      "title": "PathLineTo (stub)",
+      "description": "Line-to path command.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"PathLineTo\"] }"
+    },
+    "PathMoveTo": {
+      "title": "PathMoveTo (stub)",
+      "description": "Move-to path command.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"PathMoveTo\"] }"
+    },
+    "ConnectionSite": {
+      "title": "ConnectionSite (stub)",
+      "description": "Connection site. Defines a point on the shape boundary where connectors can attach.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"ConnectionSite\"] }"
+    },
+    "AdjustHandlePosition": {
+      "title": "AdjustHandlePosition (stub)",
+      "description": "A position reference for adjust handles and connection sites.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"AdjustHandlePosition\"] }"
+    },
+    "AdjustHandle": {
+      "title": "AdjustHandle (stub)",
+      "description": "An adjust handle (XY or Polar).\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"AdjustHandle\"] }"
+    },
+    "PolarAdjustHandle": {
+      "title": "PolarAdjustHandle (stub)",
+      "description": "Polar adjust handle. Allows the user to drag a handle in radius/angle directions.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"PolarAdjustHandle\"] }"
+    },
+    "XYAdjustHandle": {
+      "title": "XYAdjustHandle (stub)",
+      "description": "XY adjust handle. Allows the user to drag a handle in X/Y directions.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"XYAdjustHandle\"] }"
+    },
+    "ShapeLockingOptions": {
+      "title": "ShapeLockingOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"ShapeLockingOptions\"] }"
+    },
+    "SlideChild": {
+      "anyOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "shape": {
+              "$ref": "#/definitions/ShapeOptions"
+            }
+          },
+          "required": [
+            "shape"
+          ],
+          "title": "shape",
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "picture": {
+              "$ref": "#/definitions/PictureOptions"
+            }
+          },
+          "required": [
+            "picture"
+          ],
+          "title": "picture",
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "table": {
+              "$ref": "#/definitions/TableOptions"
+            }
+          },
+          "required": [
+            "table"
+          ],
+          "title": "table",
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "chart": {
+              "$ref": "#/definitions/ChartOptions"
+            }
+          },
+          "required": [
+            "chart"
+          ],
+          "title": "chart",
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "line": {
+              "$ref": "#/definitions/LineShapeOptions"
+            }
+          },
+          "required": [
+            "line"
+          ],
+          "title": "line",
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "connector": {
+              "$ref": "#/definitions/ConnectorOptions"
+            }
+          },
+          "required": [
+            "connector"
+          ],
+          "title": "connector",
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "video": {
+              "$ref": "#/definitions/VideoFrameOptions"
+            }
+          },
+          "required": [
+            "video"
+          ],
+          "title": "video",
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "audio": {
+              "$ref": "#/definitions/AudioFrameOptions"
+            }
+          },
+          "required": [
+            "audio"
+          ],
+          "title": "audio",
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "group": {
+              "$ref": "#/definitions/GroupOptions"
+            }
+          },
+          "required": [
+            "group"
+          ],
+          "title": "group",
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "smartart": {
+              "$ref": "#/definitions/SmartArtOptions"
+            }
+          },
+          "required": [
+            "smartart"
+          ],
+          "title": "smartart",
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "lockedCanvas": {
+              "$ref": "#/definitions/LockedCanvasFrameOptions"
+            }
+          },
+          "required": [
+            "lockedCanvas"
+          ],
+          "title": "lockedCanvas",
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "ole": {
+              "$ref": "#/definitions/OleOptions"
+            }
+          },
+          "required": [
+            "ole"
+          ],
+          "title": "ole",
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "contentPart": {
+              "$ref": "#/definitions/ContentPartOptions"
+            }
+          },
+          "required": [
+            "contentPart"
+          ],
+          "title": "contentPart",
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "alternateContent": {
+              "additionalProperties": false,
+              "properties": {
+                "choices": {
+                  "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "child": {
+                        "$ref": "#/definitions/SlideChild"
+                      },
+                      "requires": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "requires",
+                      "child"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "fallback": {
+                  "$ref": "#/definitions/SlideChild"
+                }
+              },
+              "required": [
+                "choices"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "alternateContent"
+          ],
+          "title": "alternateContent",
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "rawXml": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "rawXml"
+          ],
+          "title": "rawXml",
+          "type": "object"
+        }
+      ],
+      "description": "Discriminated union for slide/group children. Each variant is a plain object identified by a unique key."
+    },
+    "ContentPartOptions": {
+      "title": "ContentPartOptions (stub)",
+      "description": "p:contentPart and its typed PowerPoint 2010 extension surface.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"ContentPartOptions\"] }"
+    },
+    "Transform2DOptions": {
+      "title": "Transform2DOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"Transform2DOptions\"] }"
+    },
+    "ContentPartNonVisualProperties": {
+      "title": "ContentPartNonVisualProperties (stub)",
+      "description": "PowerPoint 2010 p14:nvContentPartPr extension properties.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"ContentPartNonVisualProperties\"] }"
+    },
+    "NonVisualContentPartPropertiesOptions": {
+      "title": "NonVisualContentPartPropertiesOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"NonVisualContentPartPropertiesOptions\"] }"
+    },
+    "ContentPartLockingOptions": {
+      "title": "ContentPartLockingOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"ContentPartLockingOptions\"] }"
+    },
+    "BaseLockingOptions": {
+      "title": "BaseLockingOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"BaseLockingOptions\"] }"
+    },
+    "LockedCanvasFrameOptions": {
+      "title": "LockedCanvasFrameOptions (stub)",
+      "description": "Locked canvas frame (p:graphicFrame with lc:lockedCanvas) for pptx slides. cNvPr fields (name/description/title/hidden) from NonVisualDrawingPropertiesOptions.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"LockedCanvasFrameOptions\"] }"
+    },
+    "LockedCanvasShapeOptions": {
+      "title": "LockedCanvasShapeOptions (stub)",
+      "description": "Locked-canvas child shape (a:sp). Shape properties (position/geometry/fill/ outline/effects) come from the core model; text is plain string only — locked-canvas shapes carry no rich text.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"LockedCanvasShapeOptions\"] }"
+    },
+    "SlideOptions": {
+      "additionalProperties": false,
+      "description": "One slide (p:sld) — children, notes, transition, and slide-level settings.",
+      "properties": {
+        "animations": {
+          "anyOf": [
+            {
+              "items": {
+                "$ref": "#/definitions/SlideAnimation"
+              },
+              "type": "array"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "description": "Structured entries, or verbatim p:timing inner XML when the source tree exceeds the model."
+        },
+        "background": {
+          "$ref": "#/definitions/BackgroundOptions"
+        },
+        "cSldExt": {
+          "description": "Raw inner XML of the p:extLst inside p:cSld — verbatim round-trip (captured from a parsed source; do not hand-author).",
+          "type": "string"
+        },
+        "children": {
+          "items": {
+            "$ref": "#/definitions/SlideChild"
+          },
+          "type": "array"
+        },
+        "colorMappingOverride": {
+          "$ref": "#/definitions/ColorMappingOverrideOptions",
+          "description": "p:clrMapOvr — override the master color mapping for this slide."
+        },
+        "commentSourcePath": {
+          "description": "Source comments package path; round-trip uses it to keep part numbering.",
+          "type": "string"
+        },
+        "comments": {
+          "items": {
+            "$ref": "#/definitions/SlideCommentOptions"
+          },
+          "type": "array"
+        },
+        "controls": {
+          "items": {
+            "$ref": "#/definitions/ControlOptions"
+          },
+          "type": "array"
+        },
+        "customerData": {
+          "items": {
+            "$ref": "#/definitions/SlideCustomerDataReferenceOptions"
+          },
+          "type": "array"
+        },
+        "ext": {
+          "description": "Raw extLst inner XML — verbatim round-trip for unmodeled extensions (captured from a parsed source; do not hand-author).",
+          "type": "string"
+        },
+        "forms": {
+          "$ref": "#/definitions/OfficeFormsOptions",
+          "description": "ODF forms anchored to this slide, including root focus and design-mode settings."
+        },
+        "groupTransformless": {
+          "description": "Omit `p:spTree/p:grpSpPr/a:xfrm` to preserve a transformless source shape tree.",
+          "type": "boolean"
+        },
+        "headerFooter": {
+          "$ref": "#/definitions/SlideHeaderFooterOptions"
+        },
+        "hidden": {
+          "description": "Hidden slide — excluded from slideshow (emits p:sld/`@show`=\"0\").",
+          "type": "boolean"
+        },
+        "layout": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/SlideLayoutType"
+            },
+            {
+              "type": "string"
+            }
+          ]
+        },
+        "layoutKey": {
+          "description": "Stable layout lookup key — round-trip uses the source p:sldLayoutId",
+          "type": "string"
+        },
+        "master": {
+          "type": "string"
+        },
+        "masterSourcePath": {
+          "description": "Source master package path; round-trip only and disambiguates same-named masters.",
+          "readOnly": true,
+          "type": "string"
+        },
+        "name": {
+          "description": "`p:cSld/`@name``.",
+          "type": "string"
+        },
+        "notes": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/definitions/NotesSlideOptions"
+            }
+          ],
+          "description": "Speaker notes — plain text shorthand, or a structured notes-slide object."
+        },
+        "notesSourcePath": {
+          "description": "Source notes-slide package path; round-trip uses it to keep part numbering and rels.",
+          "type": "string"
+        },
+        "section": {
+          "description": "Section name — slides sharing a name form one p14:section in presentation.xml.",
+          "type": "string"
+        },
+        "shapeTreeBlackWhiteMode": {
+          "description": "Root spTree grpSpPr black-and-white mode (round-trip).",
+          "type": "string"
+        },
+        "shapeTreeCreationId": {
+          "description": "Root spTree cNvPr creation id — round-trip only.",
+          "readOnly": true,
+          "type": "string"
+        },
+        "shapeTreeExt": {
+          "description": "Root spTree cNvPr extension-list inner XML — round-trip only.",
+          "readOnly": true,
+          "type": "string"
+        },
+        "shapeTreeId": {
+          "description": "Root spTree cNvPr id — round-trip only.",
+          "readOnly": true,
+          "type": "number"
+        },
+        "shapeTreeName": {
+          "description": "Root spTree cNvPr name — round-trip only.",
+          "readOnly": true,
+          "type": "string"
+        },
+        "showMasterPlaceholderAnimations": {
+          "type": "boolean"
+        },
+        "showMasterPlaceholderAnimationsPresent": {
+          "description": "Source p:sld had",
+          "type": "boolean"
+        },
+        "showMasterShapes": {
+          "type": "boolean"
+        },
+        "showMasterShapesPresent": {
+          "description": "Source p:sld had",
+          "type": "boolean"
+        },
+        "showRaw": {
+          "description": "Source lexical form of p:sld/`@show`; round-trip only — do not hand-author.",
+          "enum": [
+            "0",
+            "1"
+          ],
+          "readOnly": true,
+          "type": "string"
+        },
+        "slideId": {
+          "description": "Source p:sldIdLst identity (`p:sldId/@id`); defaults to 256 + slide index.",
+          "type": "number"
+        },
+        "slideSync": {
+          "$ref": "#/definitions/SlideSyncOptions"
+        },
+        "sourcePath": {
+          "description": "Source slide package path; round-trip only.",
+          "readOnly": true,
+          "type": "string"
+        },
+        "transition": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/TransitionOptions"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "description": "Slide transition. Structured form covers plain p:transition; a string is the verbatim mc block a source emits for reader-version extensions (mc:Choice p14:dur + mc:Fallback), re-emitted as written."
+        }
+      },
+      "type": "object"
+    },
+    "SlideSyncOptions": {
+      "title": "SlideSyncOptions (stub)",
+      "description": "Slide synchronization property types.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"SlideSyncOptions\"] }"
+    },
+    "SlideLayoutType": {
+      "title": "SlideLayoutType (stub)",
+      "description": "Slide layout family.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"SlideLayoutType\"] }"
+    },
+    "OfficeFormsOptions": {
+      "title": "OfficeFormsOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"OfficeFormsOptions\"] }"
+    },
+    "XFormsModelOptions": {
+      "title": "XFormsModelOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"XFormsModelOptions\"] }"
+    },
+    "XFormsElementOptions": {
+      "title": "XFormsElementOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"XFormsElementOptions\"] }"
+    },
+    "FormContainerOptions": {
+      "title": "FormContainerOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"FormContainerOptions\"] }"
+    },
+    "FormTabCycle": {
+      "title": "FormTabCycle (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"FormTabCycle\"] }"
+    },
+    "FormListPropertyOptions": {
+      "title": "FormListPropertyOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"FormListPropertyOptions\"] }"
+    },
+    "FormListPropertyValueOptions": {
+      "title": "FormListPropertyValueOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"FormListPropertyValueOptions\"] }"
+    },
+    "FormStringListValueOptions": {
+      "title": "FormStringListValueOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"FormStringListValueOptions\"] }"
+    },
+    "FormBooleanListValueOptions": {
+      "title": "FormBooleanListValueOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"FormBooleanListValueOptions\"] }"
+    },
+    "FormTimeListValueOptions": {
+      "title": "FormTimeListValueOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"FormTimeListValueOptions\"] }"
+    },
+    "FormDateListValueOptions": {
+      "title": "FormDateListValueOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"FormDateListValueOptions\"] }"
+    },
+    "FormCurrencyListValueOptions": {
+      "title": "FormCurrencyListValueOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"FormCurrencyListValueOptions\"] }"
+    },
+    "FormPercentageListValueOptions": {
+      "title": "FormPercentageListValueOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"FormPercentageListValueOptions\"] }"
+    },
+    "FormFloatListValueOptions": {
+      "title": "FormFloatListValueOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"FormFloatListValueOptions\"] }"
+    },
+    "FormPropertyOptions": {
+      "title": "FormPropertyOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"FormPropertyOptions\"] }"
+    },
+    "FormPropertyValueOptions": {
+      "title": "FormPropertyValueOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"FormPropertyValueOptions\"] }"
+    },
+    "FormVoidValueOptions": {
+      "title": "FormVoidValueOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"FormVoidValueOptions\"] }"
+    },
+    "FormStringValueOptions": {
+      "title": "FormStringValueOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"FormStringValueOptions\"] }"
+    },
+    "FormBooleanValueOptions": {
+      "title": "FormBooleanValueOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"FormBooleanValueOptions\"] }"
+    },
+    "FormTimeValueOptions": {
+      "title": "FormTimeValueOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"FormTimeValueOptions\"] }"
+    },
+    "FormDateValueOptions": {
+      "title": "FormDateValueOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"FormDateValueOptions\"] }"
+    },
+    "FormCurrencyValueOptions": {
+      "title": "FormCurrencyValueOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"FormCurrencyValueOptions\"] }"
+    },
+    "FormPercentageValueOptions": {
+      "title": "FormPercentageValueOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"FormPercentageValueOptions\"] }"
+    },
+    "FormFloatValueOptions": {
+      "title": "FormFloatValueOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"FormFloatValueOptions\"] }"
+    },
+    "FormNavigationMode": {
+      "title": "FormNavigationMode (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"FormNavigationMode\"] }"
+    },
+    "FormEventListenerOptions": {
+      "title": "FormEventListenerOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"FormEventListenerOptions\"] }"
+    },
+    "FormUrlEventListenerOptions": {
+      "title": "FormUrlEventListenerOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"FormUrlEventListenerOptions\"] }"
+    },
+    "FormMacroEventListenerOptions": {
+      "title": "FormMacroEventListenerOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"FormMacroEventListenerOptions\"] }"
+    },
+    "FormControlOptions": {
+      "title": "FormControlOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"FormControlOptions\"] }"
+    },
+    "GenericControlOptions": {
+      "title": "GenericControlOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"GenericControlOptions\"] }"
+    },
+    "ValueRangeControlOptions": {
+      "title": "ValueRangeControlOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"ValueRangeControlOptions\"] }"
+    },
+    "FormOrientation": {
+      "title": "FormOrientation (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"FormOrientation\"] }"
+    },
+    "GridControlOptions": {
+      "title": "GridControlOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"GridControlOptions\"] }"
+    },
+    "GridColumnOptions": {
+      "title": "GridColumnOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"GridColumnOptions\"] }"
+    },
+    "GridFormControlOptions": {
+      "title": "GridFormControlOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"GridFormControlOptions\"] }"
+    },
+    "CheckboxControlOptions": {
+      "title": "CheckboxControlOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"CheckboxControlOptions\"] }"
+    },
+    "FormVisualEffect": {
+      "title": "FormVisualEffect (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"FormVisualEffect\"] }"
+    },
+    "FormImagePosition": {
+      "title": "FormImagePosition (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"FormImagePosition\"] }"
+    },
+    "FormImageAlign": {
+      "title": "FormImageAlign (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"FormImageAlign\"] }"
+    },
+    "FormTriState": {
+      "title": "FormTriState (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"FormTriState\"] }"
+    },
+    "ListBoxControlOptions": {
+      "title": "ListBoxControlOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"ListBoxControlOptions\"] }"
+    },
+    "ListBoxOptionOptions": {
+      "title": "ListBoxOptionOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"ListBoxOptionOptions\"] }"
+    },
+    "FormListSourceType": {
+      "title": "FormListSourceType (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"FormListSourceType\"] }"
+    },
+    "FormListLinkageType": {
+      "title": "FormListLinkageType (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"FormListLinkageType\"] }"
+    },
+    "ComboBoxControlOptions": {
+      "title": "ComboBoxControlOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"ComboBoxControlOptions\"] }"
+    },
+    "ComboBoxItemOptions": {
+      "title": "ComboBoxItemOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"ComboBoxItemOptions\"] }"
+    },
+    "TimeControlOptions": {
+      "title": "TimeControlOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"TimeControlOptions\"] }"
+    },
+    "DateControlOptions": {
+      "title": "DateControlOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"DateControlOptions\"] }"
+    },
+    "NumberControlOptions": {
+      "title": "NumberControlOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"NumberControlOptions\"] }"
+    },
+    "FormattedTextControlOptions": {
+      "title": "FormattedTextControlOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"FormattedTextControlOptions\"] }"
+    },
+    "TextAreaControlOptions": {
+      "title": "TextAreaControlOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"TextAreaControlOptions\"] }"
+    },
+    "TextControlOptions": {
+      "title": "TextControlOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"TextControlOptions\"] }"
+    },
+    "HiddenControlOptions": {
+      "title": "HiddenControlOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"HiddenControlOptions\"] }"
+    },
+    "ImageFrameControlOptions": {
+      "title": "ImageFrameControlOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"ImageFrameControlOptions\"] }"
+    },
+    "FrameControlOptions": {
+      "title": "FrameControlOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"FrameControlOptions\"] }"
+    },
+    "RadioControlOptions": {
+      "title": "RadioControlOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"RadioControlOptions\"] }"
+    },
+    "ImageControlOptions": {
+      "title": "ImageControlOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"ImageControlOptions\"] }"
+    },
+    "FormButtonType": {
+      "title": "FormButtonType (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"FormButtonType\"] }"
+    },
+    "ButtonControlOptions": {
+      "title": "ButtonControlOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"ButtonControlOptions\"] }"
+    },
+    "FixedTextControlOptions": {
+      "title": "FixedTextControlOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"FixedTextControlOptions\"] }"
+    },
+    "FileControlOptions": {
+      "title": "FileControlOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"FileControlOptions\"] }"
+    },
+    "PasswordControlOptions": {
+      "title": "PasswordControlOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"PasswordControlOptions\"] }"
+    },
+    "FormConnectionResourceOptions": {
+      "title": "FormConnectionResourceOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"FormConnectionResourceOptions\"] }"
+    },
+    "FormCommandType": {
+      "title": "FormCommandType (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"FormCommandType\"] }"
+    },
+    "ControlOptions": {
+      "title": "ControlOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"ControlOptions\"] }"
+    },
+    "SlideCommentOptions": {
+      "title": "SlideCommentOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"SlideCommentOptions\"] }"
+    },
+    "DateTime": {
+      "title": "DateTime (stub)",
+      "description": "ISO 8601 timestamp (xsd:dateTime) — Office writes the UTC Z suffix.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"DateTime\"] }"
+    },
+    "ColorMappingOverrideOptions": {
+      "title": "ColorMappingOverrideOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"ColorMappingOverrideOptions\"] }"
+    },
+    "ColorSchemeIndex": {
+      "title": "ColorSchemeIndex (stub)",
+      "description": "Theme color slot referenced by.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"ColorSchemeIndex\"] }"
+    },
+    "ColorTransformOptions": {
+      "title": "ColorTransformOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"ColorTransformOptions\"] }"
+    },
+    "TextListStyleOptions": {
+      "title": "TextListStyleOptions (stub)",
+      "description": "A bare — a:defPPr plus up to 9 outline levels. The shape of a:lstStyle inside a txBody, p:notesStyle, and p:defaultTextStyle.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"TextListStyleOptions\"] }"
+    },
+    "BulletOptions": {
+      "title": "BulletOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"BulletOptions\"] }"
+    },
+    "EffectDagOptions": {
+      "title": "EffectDagOptions (stub)",
+      "description": "Options for an effect container. Supports all 28 effect types from EG_Effect, including recursive nesting.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"EffectDagOptions\"] }"
+    },
+    "OleOptions": {
+      "title": "OleOptions (stub)",
+      "description": "OLE object frame (p:graphicFrame with p:oleObj) for pptx slides. cNvPr fields (name/description/title/hidden) from NonVisualDrawingPropertiesOptions.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"OleOptions\"] }"
+    },
+    "SmartArtOptions": {
+      "title": "SmartArtOptions (stub)",
+      "description": "SmartArt diagram (p:graphicFrame). Extends NonVisualDrawingPropertiesOptions (cNvPr authored like every drawing, survives cross-format copy); `id`/`smartArtKey` auto-generated when omitted.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"SmartArtOptions\"] }"
+    },
+    "GroupOptions": {
+      "title": "GroupOptions (stub)",
+      "description": "Group shape (p:grpSp) for pptx slides. cNvPr fields from BaseGroupOptions; transform fields (incl. the child coordinate system, a:chOff/a:chExt) from GroupTransform2DOptions — an unset chOff/chExt stringifies to the group offset/extent. The rest is the group-level paint plus the children.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"GroupOptions\"] }"
+    },
+    "AudioFrameOptions": {
+      "title": "AudioFrameOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"AudioFrameOptions\"] }"
+    },
+    "VideoFrameOptions": {
+      "title": "VideoFrameOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"VideoFrameOptions\"] }"
+    },
+    "ConnectorOptions": {
+      "title": "ConnectorOptions (stub)",
+      "description": "Connector options for pptx slides (p:cxnSp). The cNvPr + locking + endpoint connection fields come from `BaseConnectorOptions`; the rest is the pptx two-endpoint positioning model plus the connector paint.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"ConnectorOptions\"] }"
+    },
+    "LineShapeOptions": {
+      "title": "LineShapeOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"LineShapeOptions\"] }"
+    },
+    "ChartOptions": {
+      "title": "ChartOptions (stub)",
+      "description": "Chart frame (p:graphicFrame → c:chartSpace): chart payload from ChartSpaceOptions (core shared model), cNvPr from NonVisualDrawingPropertiesOptions. `title` is c:title; alt text in `description`.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"ChartOptions\"] }"
+    },
+    "PictureOptions": {
+      "title": "PictureOptions (stub)",
+      "description": "Picture (p:pic) for pptx slides. Extends cross-format BasePictureOptions (binary data + cNvPr name/description/title/hidden → p:cNvPr) with absolute EMU positioning and optional shape-level effects.\nAccepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"PictureOptions\"] }"
+    },
+    "TransitionOptions": {
+      "title": "TransitionOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"TransitionOptions\"] }"
+    },
+    "NotesSlideOptions": {
+      "title": "NotesSlideOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"NotesSlideOptions\"] }"
+    },
+    "SlideHeaderFooterOptions": {
+      "title": "SlideHeaderFooterOptions (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"SlideHeaderFooterOptions\"] }"
+    },
+    "SlideAnimation": {
+      "title": "SlideAnimation (stub)",
+      "description": "Accepts any value. Expand: office-open-schema-lookup { type: \"pptx\", definitions: [\"SlideAnimation\"] }"
+    }
+  }
+}

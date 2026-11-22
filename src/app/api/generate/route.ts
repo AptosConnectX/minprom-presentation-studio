@@ -1,307 +1,486 @@
 import { NextRequest, NextResponse } from "next/server";
-import OpenAI from "openai";
+import { generateText, stepCountIs } from "ai";
+import { createWorkersAI } from "workers-ai-provider";
+import { officeOpenTools } from "office-open/ai";
+import { generatePresentationSync } from "office-open/pptx";
 import mammoth from "mammoth";
-import { writeFile, readFile, unlink } from "fs/promises";
-import { execFile } from "child_process";
-import { promisify } from "util";
+import fs from "fs";
 import path from "path";
-import { randomBytes } from "crypto";
+import {
+  PPTX_PRELOADED_SCHEMAS,
+  PRELOADED_SCHEMA_NAMES,
+} from "@/lib/pptx-preloaded-schemas";
 
-export const maxDuration = 120;
+export const maxDuration = 600;
 export const runtime = "nodejs";
 
-const execFileAsync = promisify(execFile);
+const MODEL = "@cf/openai/gpt-oss-120b";
 
-const SYSTEM_PROMPT = `Ты — специализированный ИИ-помощник Министерства промышленности, энергетики и инноваций Республики Башкортостан. Твоё имя — Башкирский Шеньжень!
+function isSuccessfulPptxResult(raw: unknown): boolean {
+  if (raw == null) return false;
+  if (Buffer.isBuffer(raw) && raw.length > 1000) return true;
+  if (raw instanceof Uint8Array && raw.length > 1000) return true;
+  if (typeof raw !== "object") return false;
 
-Твоя единственная задача — перерабатывать официальные сухие текстовые справки и доклады в структурированные презентации строго в формате .pptx (PowerPoint).
+  const r = raw as Record<string, unknown>;
+  if (r.isError === true) return false;
 
-Ты пишешь ПОЛНЫЙ рабочий Node.js-скрипт на pptxgenjs.
-Скрипт должен быть самодостаточным и создавать .pptx файл.
+  if (typeof r.base64 === "string" && r.base64.length > 100) return true;
 
-═══ ЦВЕТОВАЯ ПАЛИТРА И ФОН ═══
-• Основной фон слайда: глубокий тёмно-синий #011233
-
-═══ ТИПОГРАФИКА (строго шрифт Arial) ═══
-• Заголовок слайда: строго ВВЕРХУ, ПО ЦЕНТРУ. Arial, 22 пт, белый (#FFFFFF), полужирный. Текст заголовка ВСЕГДА КАПСОМ. Без спецсимволов (без • | — и стрелок в заголовке).
-• Крупные цифры (метрики, показатели): Arial, 36–44 пт. Цвет: #87E1C1 — положительные; #F26568 — отрицательные; #A9C7FD или #7AE4C2 — акценты.
-• Короткие важные тезисы (3–5 слов): Arial, 18–20 пт, полужирный.
-• Основной текст и списки: Arial, 14 или 16 пт, цвет белый (#FFFFFF).
-
-═══ ОФОРМЛЕНИЕ БЛОКОВ И КАРТОЧЕК ═══
-• Главные тезисы, списки и смысловые блоки — в скруглённых прямоугольных рамках (карточках).
-• Рамки: толщина границы 1.5–3 пт, среднее скругление (rectRadius ~0.1–0.15), цвет границы белый (#FFFFFF), заливка прозрачная (type: "none").
-
-═══ МАРКЕРЫ СПИСКОВ ═══
-• Вместо стандартных точек — кастомные маркеры (например ▸ или ✔ для выполненных пунктов).
-• Для числовых списков: крупная цифра (1, 2, 3) шрифтом 30–44 пт в левой части текстового контейнера.
-
-═══ РАБОТА ПО ТЕКСТУ ═══
-• Группировка по смыслам: 1 блок = 1 слайд. Один блок — одна законченная тема.
-• Не копируй абзацы целиком. Краткие тезисы не более 12–15 слов. Цифры всегда выноси крупно отдельно.
-• Не более 10–15 слайдов. Ориентир: справка ~5 страниц → презентация 3–4 слайда (та же пропорция). Агрегируй. Не создавай слайды под каждую мелочь.
-• Тезисы формулируй естественно.
-
-═══ СРАВНЕНИЯ ═══
-Если в тексте есть сравнение показателей, территорий, периодов или «было / стало» — оформляй явно, не прячь сравнение внутри одного абзаца.
-• Было → стало (или прошлый период → текущий): две карточки рядом. Слева — базовый период (нейтральный акцент), справа — текущий (зелёный #87E1C1 при росте, красный #F26568 при снижении). Крупные цифры в каждой карточке.
-• Две территории или уровня (РБ / РФ, РБ / ПФО, регион / страна и т.п.): тип split — две колонки с крупными цифрами и короткими подписями.
-• Рост и снижение в одном блоке данных: слева зона роста (зелёный акцент), справа зона снижения (красный акцент).
-• Динамика за 3 и более лет или сопоставимые периоды: либо ряд крупных метрик по годам, либо нативная диаграмма (столбцы или линия) через addChart.
-• Запрещено оставлять сравнительные цифры только внутри предложения.
-
-═══ ДИАГРАММЫ ═══
-Любая диаграмма должна быть редактируемой в PowerPoint (native chart object).
-• Только pptxgenjs addChart(...) — кольцевая (doughnut), столбчатая (bar), линейная (line).
-• Запрещено имитировать диаграмму фигурами addShape / кругами / прямоугольниками.
-• Doughnut: когда целое из частей и сумма долей ≈ 100%. На сегментах — краткие % / короткие имена. Если название длинное — проценты на кольце, полные имена в легенде справа. При необходимости — выноски.
-• Не использовать кольцевую диаграмму, если долей нет или сумма смысловых частей явно не образует целое ≈ 100%.
-
-═══ ВЫБОР ТИПА СЛАЙДА ПО СМЫСЛУ ═══
-ВАЖНО: всё, что указано в скобках после названия типа — это только ПРИМЕРЫ смысла, а не закрытый список. Тот же тип слайда применяй к любому аналогичному содержанию.
-
-Базовые типы (используй часто):
-• title — титульный слайд
-• metrics — крупные цифры (пример: ИПП, объёмы, проценты; также любые ключевые показатели)
-• split — два блока рядом (пример: рост / снижение, РБ / РФ; также любое сопоставление двух сторон)
-• columns — 2–3 равные колонки (пример: 1 / 2 / 3 место; также любые равнозначные столбцы фактов)
-• cards — карточки предприятий, проектов, мер поддержки
-• list — простой список тезисов
-• summary — итоги и приоритеты
-
-Особые типы (только по смыслу, не чаще 2–3 на всю презентацию):
-1) process (стрелки процесса / шевроны). Когда: хронология, планы, этапы, ход реализации, дорожная карта. Как: блоки слева направо, между ними стрелки или шевроны.
-2) honeycomb (соты). Когда: равные понятия, кластеры, резиденты, набор равнозначных направлений. Как: 5–7 шестиугольников или круглых ячеек, короткий текст внутри.
-3) venn (круги Венна). Когда: взаимодействие, пересечение любых 2–3 множеств (пример: наука ∩ бизнес ∩ государство — и любые другие пересечения). Как: не более 2–3 полупрозрачных пересекающихся круга с подписями зон.
-4) doughnut (кольцевая диаграмма). Когда: целое из частей, сумма долей ≈ 100% (пример: структура экспорта, бюджета, отраслей — и любая другая структура долей). Как: только native addChart doughnut + легенда по правилам блока «Диаграммы».
-5) flow (поток). Когда: один процесс переходит в следующий. Как: не более 5 блоков по горизонтали со стрелками.
-6) status (светофор). Когда: исполнение поручений, статусы мероприятий. Как: зоны СДЕЛАНО (зелёный) / В РАБОТЕ (бирюзовый) / ПЛАН (нейтральный).
-
-Правила выбора особых типов:
-• Если данных мало (1–2 пункта) — не ставь соты, Венн и process; используй list или cards.
-• Кольцо — только при явных долях ≈ 100%.
-• Венн — только при 2–3 пересекающихся множествах (любого содержания).
-• Не превращай каждый слайд в декор: особые типы — акцент, не фон.
-
-═══ ФОРМАТ ПРЕЗЕНТАЦИИ ═══
-• Layout: широкий 13.333 × 7.5 дюйма.
-• Шрифт везде Arial. Фон #011233.
-
-═══ ФОРМАТ ОТВЕТА ═══
-Верни ТОЛЬКО JavaScript-код. Без markdown, без пояснений, без code fences.
-Код обязан:
-1. Использовать require("pptxgenjs")
-2. Создавать презентацию в переменной pptx
-3. В конце:
-const outPath = process.argv[2] || "/tmp/out.pptx";
-pptx.writeFile({ fileName: outPath }).then(() => process.exit(0)).catch((e) => { console.error(e); process.exit(1); });
-
-Не используй import (только require).
-Не обращайся к сети, process.env, файлам кроме outPath.
-Код должен быть валидным ES Node.js.`
-
-async function extractTextFromDocx(buffer: Buffer): Promise<string> {
-  const result = await mammoth.extractRawText({ buffer });
-  return result.value;
-}
-
-function extractJsCode(raw: string): string {
-  let code = raw.trim();
-  code = code.replace(/^```(?:javascript|js|typescript|ts)?\s*/i, "");
-  code = code.replace(/```\s*$/i, "");
-  code = code.trim();
-
-  if (!code.includes("pptxgenjs") && !code.includes("PptxGenJS")) {
-    const match = raw.match(
-      /(?:const|var|let)\s+PptxGenJS[\s\S]*writeFile[\s\S]*/i
-    );
-    if (match) code = match[0];
+  const file = r.file;
+  if (file && typeof file === "object") {
+    const b64 = (file as Record<string, unknown>).base64;
+    if (typeof b64 === "string" && b64.length > 100) return true;
   }
-  return code;
+
+  const output = r.output;
+  if (output && typeof output === "object") {
+    const b64 = (output as Record<string, unknown>).base64;
+    if (typeof b64 === "string" && b64.length > 100) return true;
+  }
+
+  if (Buffer.isBuffer(r.buffer) && (r.buffer as Buffer).length > 1000) {
+    return true;
+  }
+
+  const data = r.data;
+  if (Buffer.isBuffer(data) && data.length > 1000) return true;
+  if (typeof data === "string" && data.length > 100) return true;
+
+  return false;
 }
 
-function sanitizeScript(code: string): string {
-  const banned = [
-    /require\s*\(\s*["']child_process["']\s*\)/i,
-    /require\s*\(\s*["']fs["']\s*\)/i,
-    /require\s*\(\s*["']net["']\s*\)/i,
-    /require\s*\(\s*["']http["']\s*\)/i,
-    /require\s*\(\s*["']os["']\s*\)/i,
-    /process\.env/i,
-    /eval\s*\(/i,
-    /Function\s*\(/i,
-    /while\s*\(\s*true\s*\)/i,
-  ];
-  for (const re of banned) {
-    if (re.test(code)) {
-      throw new Error("Скрипт содержит запрещённые конструкции");
+function extractPptxRaw(toolResults: any[]): unknown {
+  const hit = toolResults.find((r: any) => r.toolName === "generate-pptx");
+  return hit?.output ?? hit?.result ?? null;
+}
+
+function stopWhenPptxSucceeded({
+  steps,
+}: {
+  steps: Array<{ toolResults?: any[] }>;
+}) {
+  const all = steps.flatMap((s) => s.toolResults ?? []);
+  return isSuccessfulPptxResult(extractPptxRaw(all));
+}
+
+function logSchemaLookupActivity(
+  steps: Array<{ toolCalls?: any[]; toolResults?: any[] }>
+) {
+  const preloaded = new Set<string>(
+    PRELOADED_SCHEMA_NAMES as unknown as string[]
+  );
+
+  for (const step of steps) {
+    for (const call of step.toolCalls ?? []) {
+      if (call.toolName !== "office-open-schema-lookup") continue;
+
+      const input = call.input ?? call.args ?? {};
+      const defs: string[] = Array.isArray(input.definitions)
+        ? input.definitions
+        : typeof input.type === "string"
+          ? [input.type]
+          : [];
+
+      console.log(
+        "[schemas] lookup запрос:",
+        defs.length ? defs.join(", ") : JSON.stringify(input)
+      );
+
+      for (const name of defs) {
+        if (!preloaded.has(name)) {
+          console.warn(
+            `[schemas] НЕТ в контракте → при необходимости уточните: ${name}`
+          );
+        } else {
+          console.log(
+            `[schemas] уже в контракте (модель всё равно спросила): ${name}`
+          );
+        }
+      }
+    }
+
+    for (const res of step.toolResults ?? []) {
+      if (res.toolName !== "office-open-schema-lookup") continue;
+      const out = res.output ?? res.result;
+      const text = typeof out === "string" ? out : JSON.stringify(out ?? "");
+      const isErr =
+        /unknown|not found|no such|UnknownDefinition|не найден/i.test(text) ||
+        (out && typeof out === "object" && (out as any).isError === true);
+
+      if (isErr) {
+        console.warn(
+          "[schemas] lookup ОШИБКА / неизвестный тип:",
+          text.slice(0, 500)
+        );
+      } else {
+        console.log("[schemas] lookup OK, символов ответа:", text.length);
+      }
     }
   }
-  if (!/pptxgenjs/i.test(code) && !/PptxGenJS/i.test(code)) {
-    throw new Error("Скрипт не использует pptxgenjs");
-  }
-  return code;
 }
 
-async function runScript(code: string): Promise<Buffer> {
-  const id = randomBytes(8).toString("hex");
-  const scriptPath = path.join("/tmp", `pres_${id}.js`);
-  const outPath = path.join("/tmp", `pres_${id}.pptx`);
+function toPptxBuffer(rawResult: unknown): Buffer | null {
+  if (rawResult == null) return null;
+  if (Buffer.isBuffer(rawResult)) return rawResult;
+  if (rawResult instanceof Uint8Array) return Buffer.from(rawResult);
+  if (typeof rawResult !== "object") return null;
 
-  const wrapper = `
-const __OUT__ = process.argv[2];
-process.argv[2] = __OUT__;
-${code}
-`;
+  const r = rawResult as Record<string, unknown>;
 
-  await writeFile(scriptPath, wrapper, "utf8");
+  if (typeof r.base64 === "string" && r.base64.length > 0) {
+    return Buffer.from(r.base64, "base64");
+  }
+
+  const file = r.file;
+  if (file && typeof file === "object") {
+    const b64 = (file as Record<string, unknown>).base64;
+    if (typeof b64 === "string") return Buffer.from(b64, "base64");
+  }
+
+  const output = r.output;
+  if (output && typeof output === "object") {
+    const b64 = (output as Record<string, unknown>).base64;
+    if (typeof b64 === "string") return Buffer.from(b64, "base64");
+  }
+
+  if (Buffer.isBuffer(r.buffer)) return r.buffer as Buffer;
+  if (r.buffer instanceof Uint8Array) return Buffer.from(r.buffer);
+
+  if (Buffer.isBuffer(r.data)) return r.data as Buffer;
+  if (r.data instanceof Uint8Array) return Buffer.from(r.data);
+  if (typeof r.data === "string") return Buffer.from(r.data, "base64");
+
+  return null;
+}
+
+function findGeneratePptxArgs(
+  steps: Array<{ toolCalls?: any[] }>
+): unknown {
+  for (const step of steps) {
+    for (const call of step.toolCalls ?? []) {
+      if (call.toolName !== "generate-pptx") continue;
+      return call.input ?? call.args ?? null;
+    }
+  }
+  return null;
+}
+
+function tryParseSlidesJson(text: string): unknown {
+  if (!text) return null;
+  const trimmed = text.trim();
 
   try {
-    await execFileAsync(process.execPath, [scriptPath, outPath], {
-      timeout: 90000,
-      maxBuffer: 20 * 1024 * 1024,
-      env: {
-        ...process.env,
-        NODE_PATH: path.join(process.cwd(), "node_modules"),
-        HOME: "/tmp",
-      },
-      cwd: process.cwd(),
-    });
-
-    const pptxBuf = await readFile(outPath);
-    if (!pptxBuf || pptxBuf.length < 1000) {
-      throw new Error("Скрипт не создал валидный PPTX");
+    const parsed = JSON.parse(trimmed);
+    if (
+      parsed &&
+      typeof parsed === "object" &&
+      Array.isArray((parsed as any).slides)
+    ) {
+      return parsed;
     }
-    return pptxBuf;
-  } finally {
-    unlink(scriptPath).catch(() => {});
-    unlink(outPath).catch(() => {});
+  } catch {
+    /* ignore */
   }
+
+  const start = trimmed.indexOf('{"slides"');
+  if (start >= 0) {
+    try {
+      const parsed = JSON.parse(trimmed.slice(start));
+      if (parsed && Array.isArray((parsed as any).slides)) return parsed;
+    } catch {
+      /* ignore */
+    }
+  }
+
+  return null;
+}
+
+function buildPptxFromOptions(options: unknown): Buffer | null {
+  if (!options || typeof options !== "object") return null;
+  try {
+    const out = generatePresentationSync(options as any);
+    if (Buffer.isBuffer(out)) return out;
+    if (out instanceof Uint8Array) return Buffer.from(out);
+    if (out && typeof out === "object") {
+      const o = out as Record<string, unknown>;
+      if (Buffer.isBuffer(o.buffer)) return o.buffer as Buffer;
+      if (typeof o.base64 === "string") {
+        return Buffer.from(o.base64, "base64");
+      }
+    }
+    return null;
+  } catch (e) {
+    console.error("[fallback] generatePresentationSync failed:", e);
+    return null;
+  }
+}
+
+function isValidPptxBuffer(buf: Buffer): boolean {
+  return buf.length >= 1000 && buf[0] === 0x50 && buf[1] === 0x4b;
+}
+
+function isToolChoiceViolation(err: unknown): boolean {
+  const e = err as any;
+  const name = String(e?.name ?? "");
+  const msg = String(e?.message ?? e ?? "");
+  return (
+    name === "AI_ToolChoiceViolationError" ||
+    /ToolChoiceViolation/i.test(msg) ||
+    /did not contain a call to the required tool/i.test(msg)
+  );
 }
 
 export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData();
     const file = formData.get("file") as File | null;
-    const extraRaw = formData.get("extraPrompts") as string | null;
-    let extraPrompts: string[] = [];
-    if (extraRaw) {
-      try {
-        extraPrompts = JSON.parse(extraRaw);
-      } catch {
-        extraPrompts = [];
-      }
-    }
-
     if (!file) {
-      return NextResponse.json({ error: "Файл не передан" }, { status: 400 });
+      return NextResponse.json({ error: "Нет файла" }, { status: 400 });
     }
 
     const buffer = Buffer.from(await file.arrayBuffer());
-    const text = await extractTextFromDocx(buffer);
+    const text = (await mammoth.extractRawText({ buffer })).value;
 
     if (!text || text.trim().length < 50) {
       return NextResponse.json(
-        { error: "Не удалось извлечь текст из документа или текст слишком короткий" },
+        { error: "Текст слишком короткий" },
         { status: 400 }
       );
     }
 
-    const apiKey = process.env.PROXYAPI_KEY;
-    if (!apiKey) {
+    const accountId = process.env.CLOUDFLARE_ACCOUNT_ID;
+    const apiKey = process.env.CLOUDFLARE_API_KEY;
+    if (!accountId || !apiKey) {
       return NextResponse.json(
-        { error: "API-ключ не настроен на сервере" },
+        { error: "Нет ключей Cloudflare" },
         { status: 500 }
       );
     }
 
-    let system = SYSTEM_PROMPT;
-    if (extraPrompts.length > 0) {
-      system +=
-        "\n\nДОПОЛНИТЕЛЬНЫЕ ИНСТРУКЦИИ ПОЛЬЗОВАТЕЛЯ (обязательно учти при вёрстке слайдов):\n" +
-        extraPrompts.map((p, i) => `${i + 1}. ${p}`).join("\n");
-    }
+    const workersai = createWorkersAI({ accountId, apiKey });
+    console.log(
+      "Доступные инструменты office-open:",
+      Object.keys(officeOpenTools)
+    );
 
-    const openai = new OpenAI({
-      apiKey,
-      baseURL: "https://api.proxyapi.ru/v1",
-    });
+    const schemasLen = PPTX_PRELOADED_SCHEMAS?.length ?? 0;
+    console.log(
+      `[schemas] Контракт: ${schemasLen > 200 ? "OK" : "ПУСТО"} (${schemasLen} символов), типы: ${PRELOADED_SCHEMA_NAMES.join(", ")}`
+    );
 
-    const completion = await openai.chat.completions.create({
-      model: "x-ai/grok-4.7",
-      messages: [
-        { role: "system", content: system },
-        {
-          role: "user",
-          content: `Составь полный pptxgenjs-скрипт презентации по этой справке.\n\nТребования:\n- 10–15 слайдов максимум\n- фон #011233, Arial, заголовки КАПСОМ по центру\n- цифры крупно (#87E1C1 / #F26568)\n- сравнения оформляй явно (две карточки / split)\n- диаграммы только через addChart\n- при подходящем смысле process / honeycomb / venn / doughnut / flow / status\n- сохранить в process.argv[2]\n\nТекст справки:\n\n${text.slice(0, 100000)}`,
-        },
-      ],
+    // ——— ШАГ 1: Структура ———
+    console.log(">>> ШАГ 1: Генерация текстовой структуры...");
+    const step1 = await generateText({
+      model: workersai(MODEL),
+      prompt: `Сделай подробную и информативную структуру презентации в министерском стиле на основе документа ниже.
+Не упускай важные детали и цифры. 
+1 Слайд - 1 законченная мысль. Не более 10 слайдов.
+
+Документ:
+${text.slice(0, 120000)}`,
+      maxOutputTokens: 16000,
       temperature: 0.2,
-      max_tokens: 32000,
     });
 
-    const raw = completion.choices[0]?.message?.content || "";
-    if (!raw || raw.length < 200) {
+    const structureText = step1.text;
+    console.log("ШАГ 1 готов. Символов:", structureText.length);
+
+    // =========================================================================
+    // ДОБАВЛЕНО ТОЛЬКО ДЛЯ ОТЛАДКИ: Вывод структуры в консоль и файл
+    // =========================================================================
+    console.log("\n================ НАЧАЛО ТЕКСТОВОЙ СТРУКТУРЫ ================");
+    console.log(structureText);
+    console.log("================ КОНЕЦ ТЕКСТОВОЙ СТРУКТУРЫ ================\n");
+    
+    try {
+      const debugPath = path.join(process.cwd(), "step1_structure.txt");
+      fs.writeFileSync(debugPath, structureText, "utf8");
+      console.log(`[debug] Структура сохранена в файл: ${debugPath}`);
+    } catch (e) {
+      console.warn("[debug] Не удалось сохранить структуру в файл", e);
+    }
+    // =========================================================================
+
+    if (!structureText || structureText.length < 1000) {
+      console.error(
+        "Структура слишком короткая или пустая:",
+        structureText
+      );
       return NextResponse.json(
-        { error: "Модель вернула пустой или слишком короткий ответ" },
+        {
+          error:
+            "Модель не смогла построить структуру. Попробуйте ещё раз.",
+        },
         { status: 500 }
       );
     }
 
-    let code = extractJsCode(raw);
-    try {
-      code = sanitizeScript(code);
-    } catch (e: any) {
-      console.error("Sanitize failed:", e.message, code.slice(0, 400));
-      return NextResponse.json(
-        { error: e.message || "Скрипт отклонён проверкой безопасности" },
-        { status: 500 }
-      );
-    }
+    // ——— ШАГ 2: Дизайн и сборка ———
+    console.log(">>> ШАГ 2: Дизайн и сборка PPTX...");
 
-    if (!code.includes('require("pptxgenjs")') && !code.includes("require('pptxgenjs')")) {
-      code = `const PptxGenJS = require("pptxgenjs");\n` + code;
-    }
+    const systemStep2 = `Ты — ведущий дизайнер презентаций для Министерства промышленности Республики Башкортостан.
 
-    let pptxBuffer: Buffer;
+ГЛАВНАЯ ЦЕЛЬ: вызвать инструмент generate-pptx с валидным JSON.
+Не пиши JSON презентации обычным текстом — только через generate-pptx.
+
+Типы из контракта (lookup для них не нужен): ${PRELOADED_SCHEMA_NAMES.join(", ")}
+
+===== КОНТРАКТ generate-pptx =====
+${PPTX_PRELOADED_SCHEMAS}
+===== КОНЕЦ КОНТРАКТА =====
+
+Сразу вызови generate-pptx с полным массивом slides.`;
+
+    const promptStep2 = `Создай презентацию по структуре ниже.
+
+Структура:
+${structureText}`;
+
+    const generateOptsBase = {
+      model: workersai(MODEL),
+      system: systemStep2,
+      prompt: promptStep2,
+      tools: officeOpenTools,
+      maxOutputTokens: 16384,
+      temperature: 0.1 as const,
+      stopWhen: [stopWhenPptxSucceeded, stepCountIs(4)],
+    };
+
+    let result: Awaited<ReturnType<typeof generateText>>;
+
     try {
-      pptxBuffer = await runScript(code);
-    } catch (e: any) {
-      console.error("Script run failed:", e.message, e.stderr || "");
-      const retryCompletion = await openai.chat.completions.create({
-        model: "x-ai/grok-4.7",
-        messages: [
-          { role: "system", content: system },
-          {
-            role: "user",
-            content: `Предыдущий скрипт упал с ошибкой: ${String(e.message || e).slice(0, 500)}\n\nПерепиши ПОЛНЫЙ исправный pptxgenjs-скрипт. Только код, require(\"pptxgenjs\"), запись в process.argv[2].\n\nСправка:\n${text.slice(0, 80000)}`,
-          },
-        ],
-        temperature: 0.15,
-        max_tokens: 32000,
+      result = await generateText({
+        ...generateOptsBase,
+        // мягче, чем force одного tool — меньше ToolChoiceViolation на Workers AI
+        toolChoice: "required",
       });
-      const raw2 = retryCompletion.choices[0]?.message?.content || "";
-      let code2 = extractJsCode(raw2);
-      code2 = sanitizeScript(code2);
-      if (!code2.includes('require("pptxgenjs")') && !code2.includes("require('pptxgenjs')")) {
-        code2 = `const PptxGenJS = require("pptxgenjs");\n` + code2;
-      }
-      pptxBuffer = await runScript(code2);
+    } catch (e) {
+      if (!isToolChoiceViolation(e)) throw e;
+      console.warn(
+        "[retry] toolChoice violation → повтор без toolChoice"
+      );
+      result = await generateText({
+        ...generateOptsBase,
+        // без toolChoice; сработает fallback из args/text
+      });
     }
 
-    const body = new Uint8Array(pptxBuffer);
+    logSchemaLookupActivity(result.steps);
 
-    return new NextResponse(body, {
+    const allToolResults = result.steps.flatMap((s) => s.toolResults ?? []);
+    const allToolCalls = result.steps.flatMap((s) => s.toolCalls ?? []);
+    console.log(
+      "Все вызовы инструментов:",
+      allToolCalls.map((c) => c.toolName)
+    );
+
+    let pptxBuffer: Buffer | null = null;
+
+    const rawResult = extractPptxRaw(allToolResults);
+    if (rawResult) {
+      if (
+        typeof rawResult === "object" &&
+        rawResult !== null &&
+        (rawResult as any).isError === true
+      ) {
+        console.error("generate-pptx вернул ошибку:", rawResult);
+      } else {
+        console.log(
+          "Форма результата generate-pptx (первые 300 символов):",
+          JSON.stringify(rawResult)?.slice(0, 300)
+        );
+        pptxBuffer = toPptxBuffer(rawResult);
+      }
+    }
+
+    if (!pptxBuffer) {
+      const args = findGeneratePptxArgs(result.steps);
+      console.warn(
+        "[fallback] toolResults пуст или невалиден. Args generate-pptx:",
+        args ? "есть" : "нет"
+      );
+      if (args) {
+        pptxBuffer = buildPptxFromOptions(args);
+        if (pptxBuffer) {
+          console.log(
+            "[fallback] PPTX из args tool call, байт:",
+            pptxBuffer.length
+          );
+        }
+      }
+    }
+
+    if (!pptxBuffer) {
+      const fromText = tryParseSlidesJson(result.text ?? "");
+      console.warn(
+        "[fallback] parse result.text slides:",
+        fromText ? "OK" : "fail"
+      );
+      if (fromText) {
+        pptxBuffer = buildPptxFromOptions(fromText);
+        if (pptxBuffer) {
+          console.log(
+            "[fallback] PPTX из result.text, байт:",
+            pptxBuffer.length
+          );
+        }
+      }
+    }
+
+    if (!pptxBuffer) {
+      console.error(
+        "Не удалось получить PPTX ни из tool, ни из fallback."
+      );
+      console.error(
+        "result.text (первые 500):",
+        (result.text ?? "").slice(0, 500)
+      );
+      console.error(
+        "toolResults:",
+        JSON.stringify(allToolResults, null, 2)
+      );
+      return NextResponse.json(
+        {
+          error:
+            "Модель подготовила структуру, но файл PPTX не собрался. Попробуйте ещё раз.",
+        },
+        { status: 500 }
+      );
+    }
+
+    if (!isValidPptxBuffer(pptxBuffer)) {
+      console.error("Буфер не похож на PPTX. Размер:", pptxBuffer.length);
+      return NextResponse.json(
+        { error: "Получен повреждённый файл." },
+        { status: 500 }
+      );
+    }
+
+    if (pptxBuffer.length < 30_000) {
+      console.warn(
+        "PPTX подозрительно мал:",
+        pptxBuffer.length,
+        "байт. Возможно, слайды почти пустые."
+      );
+    }
+
+    console.log(
+      "Презентация успешно собрана. Размер:",
+      pptxBuffer.length,
+      "байт"
+    );
+
+    return new NextResponse(new Uint8Array(pptxBuffer), {
       status: 200,
       headers: {
         "Content-Type":
           "application/vnd.openxmlformats-officedocument.presentationml.presentation",
         "Content-Disposition": `attachment; filename="presentation.pptx"`,
-        "X-Mode": "full-script",
       },
     });
   } catch (err: any) {
-    console.error("Generate error:", err);
+    console.error("КРИТИЧЕСКАЯ ОШИБКА:", err);
     return NextResponse.json(
       { error: err.message || "Внутренняя ошибка сервера" },
       { status: 500 }

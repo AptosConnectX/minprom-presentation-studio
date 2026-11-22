@@ -18,25 +18,33 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Нет сообщений" }, { status: 400 });
     }
 
-    const apiKey = process.env.PROXYAPI_KEY;
-    if (!apiKey) {
-      return NextResponse.json({ error: "API-ключ не настроен" }, { status: 500 });
+    // Читаем ключи Cloudflare из переменных окружения
+    const apiKey = process.env.CLOUDFLARE_API_KEY;
+    const accountId = process.env.CLOUDFLARE_ACCOUNT_ID;
+
+    if (!apiKey || !accountId) {
+      return NextResponse.json(
+        { error: "API-ключ или Account ID Cloudflare не настроены" }, 
+        { status: 500 }
+      );
     }
 
+    // Настраиваем клиент OpenAI на работу с Cloudflare
     const openai = new OpenAI({
-      apiKey,
-      baseURL: "https://api.proxyapi.ru/v1",
+      apiKey: apiKey,
+      baseURL: `https://api.cloudflare.com/client/v4/accounts/${accountId}/ai/v1`,
     });
 
     let system = CHAT_SYSTEM;
     if (extraPrompts.length) {
       system +=
-        "\n\nДополнительные инструкции пользователя (применяй при ответах и при генерации презентаций):\n" +
+        "\n\nДополнительные инструкции пользователя (применяй при ответах):\n" +
         extraPrompts.map((p, i) => `${i + 1}. ${p}`).join("\n");
     }
 
     const completion = await openai.chat.completions.create({
-      model: "x-ai/grok-4.7",
+      // Используем быструю и бесплатную модель от Meta
+      model: "@cf/meta/llama-3.1-8b-instruct-fp8",
       messages: [
         { role: "system", content: system },
         ...messages.map((m) => ({
@@ -49,6 +57,7 @@ export async function POST(req: NextRequest) {
     });
 
     const reply = completion.choices[0]?.message?.content || "Не удалось получить ответ.";
+    
     return NextResponse.json({ reply });
   } catch (err: any) {
     console.error("Chat error:", err);
